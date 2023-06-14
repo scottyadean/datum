@@ -13,7 +13,7 @@ import { createClient } from 'redis';
 import 'express-async-errors';
 import AppRoutes from '../routes';
 import Logger from 'bunyan';
-import { AppErrorResponse, CustomError } from 'src/lib/utils/errors';
+import { AppErrorResponse, CustomError } from '../lib/utils/errors';
 
 const log: Logger = config.initLogger('server init');
 
@@ -70,16 +70,19 @@ export class AppServer {
 
   // global error middleware
   private errorMW(app: Application): void {
+
     app.all('*', (req: Request, res: Response) => {
       res.status(HTTP_STATUS.NOT_FOUND).json({ message: `${req.originalUrl} not found` });
-      app.use((error: AppErrorResponse, _req: Request, res: Response, next: NextFunction) => {
-        log.error(error);
-        if (error instanceof CustomError) {
-          return res.status(error.statusCode).json(error.errorMessage());
-        }
-        next();
-      });
     });
+
+    app.use((error: AppErrorResponse, _req: Request, res: Response, next: NextFunction) => {
+      log.error(error);
+      if (error instanceof CustomError) {
+        return res.status(error.statusCode).json(error.errorMessage());
+      }
+      next();
+    });
+
   }
 
   private async initServer(app: Application): Promise<void> {

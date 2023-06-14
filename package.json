@@ -9,13 +9,18 @@
     "lint-fix": "eslint src/**/*.ts --fix",
     "pretty-check": "prettier --check src/**/*.{ts,json,js}",
     "pretty-fix": "prettier --write src/**/*.{ts,json,js}",
+    "build": "tsc -p .",
+    "prepare": "ts-patch install -s",
+    "start": "nodemon ./build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@bull-board/express": "^5.2.0",
     "@socket.io/redis-adapter": "^8.2.1",
+    "bullmq": "^3.14.0",
     "bunyan": "^1.8.15",
     "compression": "^1.7.4",
     "cookie-session": "^2.0.0",
@@ -44,6 +49,7 @@
     "eslint": "^8.41.0",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "typescript-transform-paths": "^3.4.6"
   }
 }
