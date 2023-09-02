@@ -2,7 +2,7 @@ import { CacheService } from './cacheService';
 import { IUserDocument } from '../../../features/user/interfaces/userInterface';
 import { ServerError } from '../../utils/errors';
 import { Helpers } from '../../utils/helpers';
-import { forEach } from 'lodash';
+
 
 export class RedisService extends CacheService {
   constructor() {
