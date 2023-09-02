@@ -8,6 +8,7 @@ class App {
     const app: Express = express();
     const server: AppServer = new AppServer(app, 5000);
     server.start();
+    console.log('running on http://localhost:5000');
   }
 }
 

@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import { Application, json, urlencoded, Response, Request, NextFunction } from 'express';
 import http from 'http';
 import cors from 'cors';
@@ -10,7 +11,7 @@ import HTTP_STATUS from 'http-status-codes';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
-import 'express-async-errors';
+
 import AppRoutes from '../routes';
 import Logger from 'bunyan';
 import { AppErrorResponse, CustomError } from '../lib/utils/errors';
@@ -80,6 +81,7 @@ export class AppServer {
       if (error instanceof CustomError) {
         return res.status(error.statusCode).json(error.errorMessage());
       }
+
       next();
     });
 

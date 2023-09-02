@@ -70,7 +70,7 @@ export class ServerError extends CustomError {
   }
 }
 
-export class JoinRequestError extends CustomError {
+export class JoiRequestError extends CustomError {
   statusCode: number = HTTP_STATUS.BAD_REQUEST;
   status = 'error';
   constructor(msg: string) {
