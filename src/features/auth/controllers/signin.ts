@@ -8,7 +8,7 @@ import { userService } from '../../../lib/services/db/userService';
 import { BadRequestError } from '../../../lib/utils/errors';
 import {config} from '../../../config';
 import { IUserDocument } from '../../user/interfaces/userInterface';
-import { authMiddleWare } from '../../../lib/middlewares/authMiddleware';
+// import { authMiddleWare } from '../../../lib/middlewares/authMiddleware';
 
 export class SignIn{
 
@@ -18,8 +18,6 @@ export class SignIn{
         const {  username, password } = req.body;
         const key : string =  ( username.includes('@') ) ?  'email' : 'username';
         const auth : IAuthDocument = await authService.getAuthUser(key, username );
-
-
 
         if(!auth){
             throw new BadRequestError('Invalid creds');
@@ -44,7 +42,6 @@ export class SignIn{
 
         const jwt = JWT.sign(sup, config.JWT_SECRET! );
         req.session = { jwt: jwt };
-
 
         res.status(HTTP_STATUS.OK).json({ message: 'User login successfully', 'authId': `${auth._id}`, user: user, token: jwt });
 

@@ -1,6 +1,5 @@
 import mongoose, { Document } from 'mongoose';
 import { ObjectId } from 'mongodb';
-import { initial } from 'lodash';
 
 export interface IUserDocument extends Document {
   _id: string | ObjectId;

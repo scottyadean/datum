@@ -3,8 +3,9 @@ import express, {Router} from 'express';
 import { SignUp } from '../controllers/signup';
 import { SignIn } from '../controllers/signin';
 import { SignOut } from '../controllers/signout';
-import {AuthedUser} from '../controllers/authedUser';
-import { authMiddleWare } from '../../../lib/middlewares/authMiddleware';
+import { AuthedUser } from '../controllers/authedUser';
+import { AuthedPasswords } from '../controllers/authPasswords';
+//import { authMiddleWare } from '../../../lib/middlewares/authMiddleware';
 class AuthRoutes {
 
     private router: Router;
@@ -16,6 +17,8 @@ class AuthRoutes {
     public routes():Router{
         this.router.post('/signup', SignUp.prototype.create );
         this.router.post('/signin', SignIn.prototype.read );
+        this.router.post('/password/reset', AuthedPasswords.prototype.sendResetSetPassword );
+        this.router.post('/password/update/:hash', AuthedPasswords.prototype.updatePassword );
         return this.router;
     }
 

@@ -3,6 +3,9 @@ import bunyan from 'bunyan';
 dotenv.config({});
 
 class Config {
+
+  public APP_NAME: string|undefined;
+
   public DBHOST: string | undefined;
   public ENV: string | undefined;
   public NODE_ENV: string | undefined;
@@ -14,7 +17,16 @@ class Config {
   public CLOUD_SECRET: string | undefined;
   public CLOUD_KEY: string | undefined;
 
+  // email config
+  public EMAIL_FROM: string | undefined;
+  public EMAIL_KEY: string | undefined;
+  public EMAIL_USER: string | undefined;
+  public EMAIL_PASS: string | undefined;
+  public EMAIL_HOST: string | undefined;
+
+
   constructor() {
+    this.APP_NAME = process.env?.APP_NAME;
     this.DBHOST = process.env.DBHOST || '';
     this.ENV = process.env.ENV || 'development';
     this.NODE_ENV = process.env.ENV || this.ENV;
@@ -25,6 +37,15 @@ class Config {
     this.CLOUD_NAME = process.env.CLOUD_NAME || '';
     this.CLOUD_SECRET = process.env.CLOUD_SECRET || '';
     this.CLOUD_KEY = process.env.CLOUD_KEY || '';
+
+    this.EMAIL_FROM = process.env?.EMAIL_FROM;
+    this.EMAIL_KEY = process.env?.EMAIL_KEY;
+    this.EMAIL_USER = process.env?.EMAIL_USER;
+    this.EMAIL_PASS = process.env?.EMAIL_PASS;
+    this.EMAIL_HOST = process.env?.EMAIL_HOST;
+
+
+
   }
 
   public initLogger(name: string): bunyan {

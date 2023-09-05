@@ -44,17 +44,14 @@ export class SignUp{
         // Add to Database
         authQueue.addAuthUserJob({ value: authData });
 
-        omit( cacheData, [ 'uId', 'username', 'email', 'avatarColor', 'password' ] );
+        omit( cacheData, [ 'uId', 'username', 'email', 'avatarColor', 'password', 'passwordResetToken', 'passwordResetExpires' ] );
         userQueue.addUserJob( {value: cacheData} );
-
-
 
 
         const jwt : string = SignUp.getToken(authData, userObjectId);
         req.session = { jwt: jwt };
 
         res.status(HTTP_STATUS.CREATED).json( { result: authData,  message: 'user created successfully' } );
-
 
     }
 
