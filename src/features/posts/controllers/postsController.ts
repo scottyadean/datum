@@ -16,7 +16,7 @@ export class PostsController {
 
 
     public async create(req: Request, res: Response) : Promise<void> {
-        const { post, bgColor, privacy, gifUrl, profilePicture, feelings } = req.body;
+        const { post, bgColor, privacy, gifUrl, profilePicture, feelings } = req.body.data;
         const id : ObjectId = new ObjectId();
         const user = req.currentUser as IAuthDocument;
         const newPost: IPostDocument = {
