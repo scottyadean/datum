@@ -3,18 +3,20 @@ import { Application, json, urlencoded, Response, Request, NextFunction } from '
 import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
+import Logger from 'bunyan';
 import hpp from 'hpp';
 import cookieSession from 'cookie-session';
 import compression from 'compression';
-import { config } from '../config';
 import HTTP_STATUS from 'http-status-codes';
+
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
+import { BaseSockets } from '../lib/sockets/BaseSockets';
 
 import AppRoutes from '../routes';
-import Logger from 'bunyan';
 import { AppErrorResponse, CustomError } from '../lib/utils/errors';
+import { config } from '../config';
 
 const log: Logger = config.initLogger('server init');
 
@@ -121,6 +123,9 @@ export class AppServer {
   }
 
   private initSocketIO(io: Server): void {
-    log.info(io._connectTimeout);
+    const baseSockets:  BaseSockets = new BaseSockets(io);
+          baseSockets.listen();
+          log.info('socket.io running');
+
   }
 }

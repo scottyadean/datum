@@ -1,8 +1,15 @@
+import Logger from 'bunyan';
 import mongoose from 'mongoose';
 import { IUserDocument } from '../../../features/user/interfaces/userInterface';
 import { UserModel } from '../../../features/user/schemes/userSchema';
-
+import { config } from '../../../config';
 class UserService{
+
+    public logger: Logger;
+
+    constructor(){
+        this.logger = config.initLogger('user-service');
+    }
 
     public async getUserByUserNameOrEmail(username:string, email:string): Promise<IUserDocument> {
         const query = { $or: [{username: username}, {email: email}] };
@@ -12,7 +19,6 @@ class UserService{
 
 
     public async getUserByAuthId( id: string ){
-
         const users: IUserDocument[] = await UserModel.aggregate(
             [
                 {$match:  { authId: new mongoose.Types.ObjectId(id) }},
@@ -27,6 +33,16 @@ class UserService{
 
     public async createUser( data: IUserDocument ) :Promise<void> {
         await UserModel.create(data);
+    }
+
+    public async updatePostCount( id: string) : Promise<void> {
+        console.log( ` ${id} being set to update postsCount ` );
+        try{
+            await UserModel.updateOne( {authId: `${id}`}, { $inc: { postsCount: 1 } }  );
+        }catch(err){
+            this.logger.error(err);
+        }
+
     }
 
     public aggregateProject(){

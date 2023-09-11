@@ -13,8 +13,8 @@ class UserQueue extends MainQueue {
 
     public addUserJob(data: IAuthJob) : void {
         this.addJob(this.name, data);
-
     }
+
 }
 
 export const userQueue: UserQueue = new UserQueue();

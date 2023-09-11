@@ -5,13 +5,14 @@ import { SignIn } from '../controllers/signin';
 import { SignOut } from '../controllers/signout';
 import { AuthedUser } from '../controllers/authedUser';
 import { AuthedPasswords } from '../controllers/authPasswords';
-//import { authMiddleWare } from '../../../lib/middlewares/authMiddleware';
+import { authMiddleWare } from '../../../lib/middlewares/authMiddleware';
 class AuthRoutes {
 
     private router: Router;
-
+    private authRouter : Router;
     constructor(){
         this.router = express.Router();
+        this.authRouter = express.Router();
     }
 
     public routes():Router{
@@ -24,8 +25,8 @@ class AuthRoutes {
 
 
     public authedRoute(): Router {
-        this.router.get('/authed', AuthedUser.prototype.read);
-        return this.router;
+        this.authRouter.get('/authed', authMiddleWare.checkAuth, AuthedUser.prototype.read);
+        return this.authRouter;
     }
 
     public signoutRoute(): Router {

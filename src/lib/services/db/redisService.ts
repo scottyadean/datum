@@ -1,5 +1,6 @@
 import { CacheService } from './cacheService';
 import { IUserDocument } from '../../../features/user/interfaces/userInterface';
+import { ISavePostToCache } from '../../../features/posts/interfaces/postsInterface';
 import { ServerError } from '../../utils/errors';
 import { Helpers } from '../../utils/helpers';
 
@@ -16,6 +17,24 @@ export class RedisService extends CacheService {
       console.log(error);
     }
   }
+
+  public async savePost(data: ISavePostToCache) : Promise<void> {
+    try {
+        const {key, post} = data;
+        if ( !this.client.isOpen ){ await this.connect(); }
+        await this.client.SET( `post-${key}`, JSON.stringify(post) );
+    } catch (error) {
+        console.log(error);
+        throw new ServerError('could not save post cache!');
+    }
+  }
+
+  public async getPost(key:string) : Promise<string | null>{
+    if ( !this.client.isOpen ){ await this.connect(); }
+    const data = await this.client.GET(key);
+    return data;
+  }
+
 
   public async saveUser(key: string, userId: string, data: IUserDocument): Promise<void> {
     console.log(key, userId, data);

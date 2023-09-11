@@ -34,6 +34,10 @@ class AuthService{
         return user;
     }
 
+    public tokenDecode(token: string): IAuthDocument {
+        return JWT.decode(token) as unknown as IAuthDocument;
+    }
+
     public async getAuthUser(key: string, search: string): Promise<IAuthDocument> {
         const query = { [key]: search};
         const user : IAuthDocument = await AuthModel.findOne( query ) as IAuthDocument;

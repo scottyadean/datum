@@ -1,11 +1,23 @@
-import type {Config} from 'jest';
+import type { JestConfigWithTsJest } from 'ts-jest';
 
-const config: Config = {
-  verbose: true,
-  projects: ['<rootDir>/src/tests/*'],
-  collectCoverage: false,
-  testEnvironment: 'node',
-  testPathIgnorePatterns: [ '/node_modules/' ]
+const jestConfig: JestConfigWithTsJest = {
+
+
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "transform": {
+    "node_modules/variables/.+\\.(j|t)sx?$": "ts-jest"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!variables/.*)"
+  ],
+
+
+  testMatch: ['<rootDir>/**/*Test.ts'],
+  moduleNameMapper: {
+    '^@App/(.*)$': '<rootDir>/src/$1',
+    '^lib/(.*)$': '<rootDir>/lib/$1',
+  },
 };
 
-export default config;
+export default jestConfig;
