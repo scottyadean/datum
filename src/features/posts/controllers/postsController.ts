@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { Request, Response } from 'express';
 //import {joiValidation} from '../../../lib/decorators/authValidation';
 import HTTP_STATUS from 'http-status-codes';
-import { IPostDocument } from '../interfaces/postsInterface';
+import { IPostDocument, IReactionPostRequest } from '../interfaces/postsInterface';
 import { RedisService } from '../../../lib/services/db/redisService';
 import { IAuthDocument } from '../../auth/interfaces/authInterface';
 import { SOCKET_SERVER } from '../../../lib/sockets/BaseSockets';
@@ -13,7 +13,6 @@ const postService: PostService = new PostService();
 const redisService:  RedisService = new  RedisService();
 
 export class PostsController {
-
 
     public async create(req: Request, res: Response) : Promise<void> {
         const { post, bgColor, privacy, gifUrl, profilePicture, feelings } = req.body.data;
@@ -51,22 +50,18 @@ export class PostsController {
 
     }
 
-
     public async update(req: Request, res: Response): Promise<void> {
         let success = true;
         const { id,  data  } = req.body;
         const uid = req.currentUser?.userId;
-        console.log(uid);
         try{
             success = await postService.updatePost(id, uid!, data);
         }catch(err){
             console.log(err);
             success = false;
         }
-
         res.status(HTTP_STATUS.OK).json( { success, id, uid, data  } );
     }
-
 
     public async read( req: Request, res: Response ): Promise<void> {
         const id = req.params.id;
@@ -79,8 +74,49 @@ export class PostsController {
         }
     }
 
+    public async recation(req: Request, res: Response): Promise<void> {
+
+        let error = null;
+        let success = true;
+        try{
+            const { id,  data  } = req.body;
+            const user = req.currentUser;
+            const update: IReactionPostRequest = {
+                        key: `reaction-${id}`,
+                        typ: `${data.type}`,
+                        lst: `${data.last}`,
+                        username: `${user?.username}`,
+                        userId: `${user?.authId}`,
+                        userImage: '',
+                        fromId: `${user?.authId}`,
+                        type: `${data.type}`,
+                        createdAt: new Date(),
+                        comment: `${data.comment}`
+
+            } as IReactionPostRequest;
+            await postService.setReaction(id, update);
+
+        }catch(err){
+            error = err;
+            success = false;
+        }
+
+        res.status(HTTP_STATUS.OK).json({ error, success });
+    }
 
 
+    public async readReactions(req: Request, res: Response) : Promise<void> {
+        let reactions = null;
+        let error = null;
+        const id = req.params.id;
+        try{
+            reactions = await postService.getReactions(id);
+        }catch(err){
+            error = err;
+        }
+
+        res.status(HTTP_STATUS.OK).json( {  reactions, error  } );
+    }
 
 
 

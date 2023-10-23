@@ -15,14 +15,18 @@ class PostRoutes {
 
     public routes():Router {
         this.router.get('/read/:id', PostsController.prototype.read );
+        this.router.get('/reactions/:id', PostsController.prototype.readReactions);
         return this.router;
     }
 
     public authRoutes():Router {
         this.authRouter.post('/create', PostsController.prototype.create);
         this.authRouter.post('/update', PostsController.prototype.update);
+        this.authRouter.post('/recation', PostsController.prototype.recation);
         return this.authRouter;
     }
+
+
 
 }
 

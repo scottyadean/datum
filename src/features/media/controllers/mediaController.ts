@@ -1,19 +1,11 @@
- 
-    import { Request, Response } from 'express';
-    import HTTP_STATUS from 'http-status-codes';
-    import { __add_service__ } from '../../../lib/services/db/mediaService';
 
+import { Request, Response } from 'express';
+import HTTP_STATUS from 'http-status-codes';
 
-    export class MediaController {
+export class MediaController {
 
-        public async read( req: Request, res: Response ): Promise<void> {
-            try{
-                const media = mediaService.getById(req.params.id);
-            }catch(err){
-                console.log(err);
-            }
-            
-            res.status(HTTP_STATUS.OK).json( { media } );
-        }
-
+    public async read( _req: Request, res: Response ): Promise<void> {
+        res.status(HTTP_STATUS.OK).json( { hello:'world' } );
     }
+
+}

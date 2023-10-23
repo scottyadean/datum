@@ -87,14 +87,14 @@ export class EmailSender {
 
     public setTransporter() :void {
 
-        this.transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            auth: {
-                user: 'claire58@ethereal.email',
-                pass: 'HxvDw21GjgpccWn4ga'
-            }
-        });
+        // this.transporter = nodemailer.createTransport({
+        //     host: 'smtp.ethereal.email',
+        //     port: 587,
+        //     auth: {
+        //         user: 'claire58@ethereal.email',
+        //         pass: 'HxvDw21GjgpccWn4ga'
+        //     }
+        // });
 
 
         // this.transporter = nodemailer.createTransport({
@@ -106,6 +106,17 @@ export class EmailSender {
         //       pass: config.EMAIL_PASS!,
         //     },
         //   });
+
+
+        this.transporter = nodemailer.createTransport({
+            host: 'smtp.ethereal.email',
+            port: 587,
+            auth: {
+                user: 'joey.bechtelar@ethereal.email',
+                pass: 'FPJBYtVPXw6nXN7Tu8'
+            }
+        });
+
     }
 
 

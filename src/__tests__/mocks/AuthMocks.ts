@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { AuthPayload, IAuthDocument  } from '../features/auth/interfaces/authInterface';
+import { AuthPayload, IAuthDocument  } from '../../features/auth/interfaces/authInterface';
 
 export interface IMockJWT {
     jwt?: string;
@@ -78,3 +78,12 @@ export interface IAuthMock {
     save: () => {console.log('test');},
     comparePassword: () => false
   } as unknown as IAuthDocument;
+
+
+  export const AuthControllerMock = () : void => {
+    jest.mock( './features/services/db/cacheService' );
+    jest.mock( './features/services/db/redisService' );
+    jest.mock( './features/services/queue/authQueue' );
+    jest.mock( './features/services/queue/mainQueue' );
+    jest.mock( './features/services/queue/userQueue' );
+};

@@ -1,21 +1,34 @@
+import Logger from 'bunyan';
 import { CacheService } from './cacheService';
 import { IUserDocument } from '../../../features/user/interfaces/userInterface';
-import { ISavePostToCache } from '../../../features/posts/interfaces/postsInterface';
+import { IReactionPostRequest, ISavePostToCache } from '../../../features/posts/interfaces/postsInterface';
 import { ServerError } from '../../utils/errors';
 import { Helpers } from '../../utils/helpers';
-
+import { config } from '../../../config';
 
 export class RedisService extends CacheService {
+
+  public logger: Logger;
+
   constructor() {
     super();
+    this.logger = config.initLogger('post-service');
   }
 
   async connect(): Promise<void> {
     try {
       await this.client.connect();
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
     }
+  }
+
+  async checkConnection(): Promise<void> {
+
+    if ( !this.client.isOpen ){
+        await this.connect();
+    }
+
   }
 
   public async savePost(data: ISavePostToCache) : Promise<void> {
@@ -24,10 +37,30 @@ export class RedisService extends CacheService {
         if ( !this.client.isOpen ){ await this.connect(); }
         await this.client.SET( `post-${key}`, JSON.stringify(post) );
     } catch (error) {
-        console.log(error);
-        throw new ServerError('could not save post cache!');
+        this.logger.error(error);
+        throw new ServerError('could not save post cache');
     }
   }
+
+  // public async savePostReactionToCache(data: IReactionPostRequest): Promise<void>{
+  //   try {
+  //     await this.checkConnection();
+
+  //     if(data.lst){
+  //       //
+  //     }
+
+  //     if(data.typ){
+  //         await this.client.lPush(`reactions:${data.key}`, JSON.stringify(data.reaction));
+  //     }
+
+
+
+  //   } catch(error){
+  //     this.logger.error(error);
+  //     throw new ServerError('could not save reaction to cache');
+  //   }
+  // }
 
   public async getPost(key:string) : Promise<string | null>{
     if ( !this.client.isOpen ){ await this.connect(); }
@@ -37,17 +70,14 @@ export class RedisService extends CacheService {
 
 
   public async saveUser(key: string, userId: string, data: IUserDocument): Promise<void> {
-    console.log(key, userId, data);
 
     try {
         const userData = this.getUserData(data);
-        if ( !this.client.isOpen ){
-            await this.connect();
-        }
+        await this.checkConnection();
         await this.client.ZADD('user', { score: parseInt(userId, 10), value: `${key}` });
         await this.client.hSet(`users:${key}`, userData);
     } catch (error) {
-        console.log(error);
+        this.logger.error(error);
         throw new ServerError('could not save user cache!');
     }
   }
@@ -55,11 +85,7 @@ export class RedisService extends CacheService {
   public async getUserFromCache(key: string) : Promise<Partial<IUserDocument>|null>  {
     const output : Partial<IUserDocument> = {};
     try{
-        if ( !this.client.isOpen ){
-            await this.connect();
-        }
-
-        // cache is not working
+        await this.checkConnection();
         const user: IUserDocument = await this.client.HGETALL(`users:${key}`) as unknown as IUserDocument;
         const parser = {  'blocked': 1,
                           'blockedBy': 1,
@@ -72,21 +98,16 @@ export class RedisService extends CacheService {
                 output[k as keyof IUserDocument] = v;
             }
           }
-
-          console.log('output is eq to: ');
-          console.log(output);
-
     }catch(err){
+        this.logger.error(err);
         throw new ServerError('no user cache found');
     }
-
 
     if( Object.keys( output ).length === 0 ){
       return null;
     }
 
     return output;
-
   }
 
   public getUserData(data: IUserDocument): string[] {

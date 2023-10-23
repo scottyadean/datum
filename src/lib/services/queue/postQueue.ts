@@ -14,7 +14,6 @@ class PostQueue extends MainQueue {
 
     public addPostJob(data: IPostJobData) : void {
         this.addJob(this.name, data);
-
     }
 }
 
