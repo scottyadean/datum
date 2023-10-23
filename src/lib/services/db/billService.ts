@@ -83,7 +83,7 @@ export class BillService{
      * @param contributorId
      * @returns boolean
      */
-    public canEditBillBody( bill: IBillDocument, contributorId:string ) : boolean {
+    public canEditBill( bill: IBillDocument, contributorId:string ) : boolean {
         // if bill host id or contribitors does not contain the user id
         if ( `${bill?.billHostId}` === `${contributorId}` ){
             return true;
@@ -187,11 +187,9 @@ export class BillService{
     public async updateBill(id: string, contributorId: string, data: IBillDocument) : Promise<boolean> {
         try{
             const bill = await BillModel.findOne({_id: `${id}`});
-
-            if( !bill || !this.canEditBillBody( bill, contributorId)) {
+            if( !bill || !this.canEditBill( bill, contributorId)) {
                 return false;
             }
-
             bill.update({...data});
             //await this.redisService.saveBill({ key: id, post: post });
             const res = await BillModel.updateOne({_id: `${id}`}, { ...data });
@@ -206,7 +204,7 @@ export class BillService{
         try{
             const bill = await BillModel.findOne({_id: `${id}`});
             if(!bill) {return ['error', 'bill not found', data]; }
-            if(!this.canEditBillBody(bill as IBillDocument, `${contributorId}`)){ return ['error', 'Can not edit', data]; }
+            if(!this.canEditBill(bill as IBillDocument, `${contributorId}`)){ return ['error', 'Can not edit', data]; }
 
             if ( method === 'insert' || `${bill?.body.length}` === '0' ){
                 data.version = 1;

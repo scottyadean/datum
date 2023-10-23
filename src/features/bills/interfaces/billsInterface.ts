@@ -75,6 +75,12 @@ export interface IBillVideos{
         format?: string;
 }
 
+export interface IBillSubject{
+        name: string;
+        url: string;
+        description: string;
+}
+
 export interface IBillDocument extends Document {
         _id: string | ObjectId;
         sessionId: string| ObjectId;
@@ -89,7 +95,7 @@ export interface IBillDocument extends Document {
         description: string;
         summary: string;
         body: [IBillBody];
-        sections: [IBillBody];
+        subjects: [IBillSubject];
         amendments: [IBillBody];
         contributors: [ IBillContributors ];
         sponsors: [IBillSponsors];
