@@ -14,7 +14,6 @@ class AuthQueue extends MainQueue {
 
     public addAuthUserJob(data: IAuthJob) : void {
         this.addJob(this.name, data);
-
     }
 
 }

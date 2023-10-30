@@ -1,10 +1,10 @@
 import Logger from 'bunyan';
-import { CacheService } from './cacheService';
-import { IUserDocument } from '../../../features/user/interfaces/userInterface';
-import { IReactionPostRequest, ISavePostToCache } from '../../../features/posts/interfaces/postsInterface';
-import { ServerError } from '../../utils/errors';
-import { Helpers } from '../../utils/helpers';
-import { config } from '../../../config';
+import { CacheService } from '../../../../src/lib/services/db/cacheService';
+import { IUserDocument } from '../../../../src/features/user/interfaces/userInterface';
+import { ISavePostToCache } from '../../../../src/features/posts/interfaces/postsInterface';
+import { ServerError } from '../../../../src/lib/utils/errors';
+import { Helpers } from '../../../../src/lib/utils/helpers';
+import { config } from '../../../../src/config';
 
 export class RedisService extends CacheService {
 
@@ -114,6 +114,7 @@ export class RedisService extends CacheService {
     const createdAt = new Date();
     const { _id,
             uId,
+            displayName,
             username,
             email,
             avatarColor,
@@ -134,6 +135,7 @@ export class RedisService extends CacheService {
     const userData: string[] = [
       '_id', `${_id}`,
       'uId', `${uId}`,
+      'displayName', `${displayName}`,
       'username', `${username}`,
       'email', `${email}`,
       'createdAt', `${createdAt}`,

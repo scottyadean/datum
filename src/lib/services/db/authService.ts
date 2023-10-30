@@ -1,28 +1,15 @@
 import JWT from 'jsonwebtoken';
 
-import { IAuthDocument } from '../../../features/auth/interfaces/authInterface';
-import { AuthModel } from '../../../features/auth/schemes/auth';
-import { RedisService } from '../../services/db/redisService';
 import { IUserDocument } from '../../../features/user/interfaces/userInterface';
+import { IAuthDocument, IAuthDocPartial } from '../../../features/auth/interfaces/authInterface';
 import { userService } from '../../../lib/services/db/userService';
 import { AuthPayload } from '../../../features/auth/interfaces/authInterface';
+import { AuthModel } from '../../../features/auth/schemes/auth';
+import { UserCache } from '../cache/users/UserCache';
 import { config } from '../../../config';
 
 
-
-export interface IAuthDocPartial {
-    uId?: string;
-    username?: string;
-    email?: string;
-    password?: string;
-    avatarColor?: string;
-    createdAt?: Date;
-    passwordResetToken?: string;
-    passwordResetExpires?: number | string;
-};
-
-
-const redisService: RedisService = new RedisService();
+const userCache: UserCache = new UserCache();
 
 class AuthService{
 
@@ -64,11 +51,10 @@ class AuthService{
 
     public async getUserFromToken( token: string) : Promise<IUserDocument> {
         const payload: AuthPayload = JWT.verify(token, config.JWT_SECRET!) as unknown as AuthPayload;
-        const cachedUser: IUserDocument = await redisService.getUserFromCache(`${payload.userId}`) as IUserDocument;
-        const currentUser: IUserDocument = (cachedUser) ? cachedUser : await userService.getUserByAuthId(`${payload.authId}`);
+        const cachedUser: IUserDocument = await userCache.getUserFromCache(`${payload.userId}`) as IUserDocument;
+        const currentUser: IUserDocument = (cachedUser) ? cachedUser : await userService.getUserByAuthId(`${payload.userId}`);
         return currentUser;
     }
-
 
 }
 

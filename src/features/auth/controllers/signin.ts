@@ -3,49 +3,66 @@ import HTTP_STATUS from 'http-status-codes';
 import JWT from 'jsonwebtoken';
 
 import { IAuthDocument } from '../interfaces/authInterface';
+import { IUserDocument } from '../../user/interfaces/userInterface';
+
 import { authService } from '../../../lib/services/db/authService';
 import { userService } from '../../../lib/services/db/userService';
+
 import { BadRequestError } from '../../../lib/utils/errors';
-import {config} from '../../../config';
-import { IUserDocument } from '../../user/interfaces/userInterface';
-// import { authMiddleWare } from '../../../lib/middlewares/authMiddleware';
+//import { CryptUtil } from '../../../lib/utils/crypt';
+import { config } from '../../../config';
+
 
 export class SignIn{
 
+    /**
+     * check the user and auth table for a valid
+     * @param req
+     * @param res
+     */
     public async read (req: Request, res: Response) : Promise<void> {
 
-
+        // get request body
         const {  username, password } = req.body;
-        const key : string =  ( username.includes('@') ) ?  'email' : 'username';
-        const auth : IAuthDocument = await authService.getAuthUser(key, username );
 
+        // let the user try to log in with the email or username
+        const key : string =  ( username.includes('@') ) ?  'email' : 'username';
+
+        // username not found
+        const auth : IAuthDocument = await authService.getAuthUser(key, username );
         if(!auth){
             throw new BadRequestError('Invalid creds');
         }
 
+        // password mismatch
         const passwordMatch: boolean = await auth.comparePassword(password);
-
         if (!passwordMatch) {
             throw new BadRequestError('Invalid creds');
         }
 
+        //get private auth data.
         const user: IUserDocument = await userService.getUserByAuthId(`${auth._id}`);
 
+        // console.log(user);
+        // roles format encypted::visiable
+        const roles = user.roles?.permissions.join('|');
+        // const encrypted_roles = CryptUtil.encypt( `${roles}`, `${config.CLOUD_SECRET}` );
+
+        // token info
         const sup = {
-            authId: auth._id,
             userId: user._id,
-            uId: auth.uId,
             email: auth.email,
             username: auth.username,
-            acolor: auth.avatarColor
+            admin: user.roles?.isAdmin,
+            roles: `${roles}`
         };
 
+        //set the session jwt token
         const jwt = JWT.sign(sup, config.JWT_SECRET! );
         req.session = { jwt: jwt };
 
-        res.status(HTTP_STATUS.OK).json({ message: 'User login successfully', 'authId': `${auth._id}`, user: user, token: jwt });
-
-
+        //success
+        res.status(HTTP_STATUS.OK).json({ message: 'User login successfully', 'userId': `${user._id}`, user: user, token: jwt });
 
     }
 

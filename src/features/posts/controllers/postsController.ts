@@ -3,81 +3,109 @@ import { Request, Response } from 'express';
 //import {joiValidation} from '../../../lib/decorators/authValidation';
 import HTTP_STATUS from 'http-status-codes';
 import { IPostDocument, IReactionPostRequest } from '../interfaces/postsInterface';
-import { RedisService } from '../../../lib/services/db/redisService';
+import { PostCache } from '../../../lib/services/cache/posts/postCache';
 import { IAuthDocument } from '../../auth/interfaces/authInterface';
 import { SOCKET_SERVER } from '../../../lib/sockets/BaseSockets';
 import { postQueue } from '../../../lib/services/queue/postQueue';
 import { PostService } from '../../../lib/services/db/postService';
+import { Lang } from '../../../lib/utils/lang';
 
 const postService: PostService = new PostService();
-const redisService:  RedisService = new  RedisService();
+const postCache: PostCache = new PostCache();
 
 export class PostsController {
 
+    /**
+     * Create a post
+     * @method post
+     * @param req
+     * @param res
+     */
     public async create(req: Request, res: Response) : Promise<void> {
-        const { post, bgColor, privacy, gifUrl, profilePicture, feelings } = req.body.data;
-        const id : ObjectId = new ObjectId();
-        const user = req.currentUser as IAuthDocument;
-        const newPost: IPostDocument = {
-            _id: id,
-            userId: user.userId,
-            username: user.username,
-            email: user.email,
-            profilePicture,
-            avatarColor: bgColor,
-            post,
-            feelings,
-            privacy,
-            gifUrl,
-            commentsCount: 0,
-            imgId: '',
-            imgVersion: '',
-            createdAt: new Date(),
-            reactions: {
-                like: 0,
-                love: 0,
-                haha: 0,
-                sad: 0,
-                wow: 0,
-                angry: 0
-            }
-        } as IPostDocument;
+        try{
+            const { post, bgColor, privacy, gifUrl, profilePicture, feelings } = req.body.data;
+            const id : ObjectId = new ObjectId();
+            const user = req.currentUser as IAuthDocument;
+            const newPost: IPostDocument = {
+                _id: id,
+                userId: user.userId,
+                username: user.username,
+                email: user.email,
+                profilePicture,
+                avatarColor: bgColor,
+                post,
+                feelings,
+                privacy,
+                gifUrl,
+                commentsCount: 0,
+                imgId: '',
+                imgVersion: '',
+                createdAt: new Date(),
+                reactions: {
+                    like: 0,
+                    love: 0,
+                    haha: 0,
+                    sad: 0,
+                    wow: 0,
+                    angry: 0
+                }
+            } as IPostDocument;
 
-        redisService.savePost({key: id, post: newPost});
-        SOCKET_SERVER.emit('new-post', post);
-        postQueue.addPostJob({ value: newPost } );
-        res.status(HTTP_STATUS.OK).json( { message: 'Post Created Successfully', newPost } );
+            //save post cache
+            postCache.savePostCache({key: id, post: newPost});
+            //emit socket message
+            SOCKET_SERVER.emit('new-post', post);
 
+            //save the post to the db. thru the queue
+            postQueue.addPostJob({ value: newPost } );
+
+            //return success
+            res.status(HTTP_STATUS.OK).json( { result: Lang.createOk('Post'), newPost } );
+        }catch(err){
+            res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
+        }
     }
 
+    /**
+     * Update a post
+     * @method post
+     * @param req
+     * @param res
+     */
     public async update(req: Request, res: Response): Promise<void> {
-        let success = true;
-        const { id,  data  } = req.body;
-        const uid = req.currentUser?.userId;
         try{
-            success = await postService.updatePost(id, uid!, data);
+            const { id,  data  } = req.body;
+            const uid = req.currentUser?.userId;
+            const result = await postService.updatePost(id, uid!, data);
+            res.status(HTTP_STATUS.OK).json( { result, id, uid, data, error:null  } );
         }catch(err){
-            console.log(err);
-            success = false;
+            res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
         }
-        res.status(HTTP_STATUS.OK).json( { success, id, uid, data  } );
     }
 
+    /**
+     * Return a post by id
+     * @method get
+     * @param req
+     * @param res
+     */
     public async read( req: Request, res: Response ): Promise<void> {
-        const id = req.params.id;
         try{
+            const id = req.params.id;
             const post:string|null = await postService.getPostById(`${id}`);
-            res.status(HTTP_STATUS.OK).json( { post: JSON.parse(post!), error:null, id } );
+            res.status(HTTP_STATUS.OK).json( { result: JSON.parse(post!), error:null, id } );
         }catch(err){
-            console.log(err);
-            res.status(HTTP_STATUS.BAD_REQUEST).json( { post:null, error:err,  id } );
+            res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
         }
     }
 
+    /**
+     * Set a post reaction like|love|dislike|happy
+     * @method post
+     * @param req
+     * @param res
+     */
     public async recation(req: Request, res: Response): Promise<void> {
-
-        let error = null;
-        let success = true;
         try{
             const { id,  data  } = req.body;
             const user = req.currentUser;
@@ -86,38 +114,37 @@ export class PostsController {
                         typ: `${data.type}`,
                         lst: `${data.last}`,
                         username: `${user?.username}`,
-                        userId: `${user?.authId}`,
+                        userId: `${user?.userId}`,
                         userImage: '',
-                        fromId: `${user?.authId}`,
+                        fromId: `${user?.userId}`,
                         type: `${data.type}`,
                         createdAt: new Date(),
                         comment: `${data.comment}`
 
             } as IReactionPostRequest;
+
             await postService.setReaction(id, update);
-
+            res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes({ message: Lang.createOk('Post Reaction'), update }) );
         }catch(err){
-            error = err;
-            success = false;
+            res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
         }
-
-        res.status(HTTP_STATUS.OK).json({ error, success });
     }
 
-
+    /**
+     * return post reactions
+     * @method get
+     * @param req
+     * @param res
+     */
     public async readReactions(req: Request, res: Response) : Promise<void> {
-        let reactions = null;
-        let error = null;
-        const id = req.params.id;
         try{
-            reactions = await postService.getReactions(id);
+            const id = req.params.id;
+            const reactions = await postService.getReactions(id);
+            res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes(reactions) );
         }catch(err){
-            error = err;
+            res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
         }
 
-        res.status(HTTP_STATUS.OK).json( {  reactions, error  } );
     }
-
-
 
 }

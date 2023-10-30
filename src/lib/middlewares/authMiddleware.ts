@@ -35,6 +35,18 @@ class AuthMiddleWare {
         next();
     }
 
+    public checkAdmin(req: Request, _res: Response, next: NextFunction) :void {
+        if(!req.currentUser){
+            throw new NoAuthError('no auth');
+        }
+
+        if(!req.currentUser.isAdmin){
+            throw new NoAuthError('not admin');
+        }
+
+        next();
+    }
+
 
 }
 

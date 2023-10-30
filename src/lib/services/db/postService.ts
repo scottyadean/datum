@@ -1,20 +1,20 @@
 import Logger from 'bunyan';
 
-import { IPostDocument, IReactionPostRequest, IPostReactionDocument, IReactions, IReactionDocument } from '../../../features/posts/interfaces/postsInterface';
+import { IPostDocument, IReactionPostRequest, IPostReactionDocument, IReactions } from '../../../features/posts/interfaces/postsInterface';
 import { PostReactionsModel } from '../../../features/posts/models/postReactionsModel';
-
 import { PostsModel } from '../../../features/posts/models/postsModel';
-import { RedisService } from './redisService';
+import { PostCache } from '../cache/posts/postCache';
 import { config } from '../../../config';
 
 
 
 export class PostService{
 
-    public redisService: RedisService;
+    public postCache: PostCache;
     public logger: Logger;
+
     constructor(){
-        this.redisService = new RedisService();
+        this.postCache = new PostCache();
         this.logger = config.initLogger('post-service');
     }
 
@@ -33,7 +33,7 @@ export class PostService{
                 return false;
             }
             post.update({...data});
-            await this.redisService.savePost({ key: id, post: post });
+            await this.postCache.savePostCache({ key: id, post: post });
             const res = await PostsModel.updateOne({_id: `${id}`}, { ...data });
             return res.acknowledged;
         }catch(err){
@@ -44,13 +44,13 @@ export class PostService{
 
     public async getPostById(id:string) : Promise<string> {
         try{
-            const postjson = await this.redisService.getPost(`post-${id}`);
+            const postjson = await this.postCache.getPostFromCache(`post-${id}`);
             if ( postjson! ){
                 return postjson;
             }
             const post =  await PostsModel.findById(id);
             if(post) {
-                this.redisService.savePost({key: id, post: post});
+                this.postCache.savePostCache({key: id, post: post});
                 return  JSON.stringify(post);
             }
         }catch(err){
@@ -61,15 +61,13 @@ export class PostService{
 
     public async getPostDoc(id:string) : Promise<IPostDocument|null> {
         try{
-            const postjson = await this.redisService.getPost(`post-${id}`);
+            const postjson = await this.postCache.getPostFromCache(`post-${id}`);
             if ( postjson! ){
-                console.log('yes post was from cache');
-                console.log(postjson);
                 return JSON.parse(postjson) as IPostDocument;
             }
             const post = await PostsModel.findById(id);
             if(post) {
-                this.redisService.savePost({key: id, post: post});
+                this.postCache.savePostCache({key: id, post: post});
                 return  post;
             }
         }catch(err){
@@ -87,7 +85,6 @@ export class PostService{
         }
     }
 
-
     public async setReaction(id:string, data:IReactionPostRequest) : Promise<boolean> {
         const post = await this.getPostDoc(id);
         if( post ){
@@ -98,7 +95,7 @@ export class PostService{
             const updateData = {  reactions:  updateReactions   };
             await PostsModel.updateOne( {_id: `${id}`}, { $inc: this.getReactionUpdate(idx) }  );
             post.reactions = updateData.reactions;
-            await this.redisService.savePost({ key: id, post: post });
+            await this.postCache.savePostCache({ key: id, post: post });
             const reactionData: IPostReactionDocument = {
                 postId: post._id,
                 type: data.typ,
@@ -143,12 +140,10 @@ export class PostService{
 
     }
 
-
     private updateCount(count:string) : number {
         let cnt =( +count ) as number;
         return ( cnt += 1 ) as number;
     }
-
 
     private getReactionUpdate( idx: string ) : object {
         switch ( idx ) {

@@ -5,6 +5,7 @@ export interface IUserDocument extends Document {
   _id: string | ObjectId;
   authId: string | ObjectId;
   username?: string;
+  displayName?: string;
   email?: string;
   password?: string;
   avatarColor?: string;
@@ -27,9 +28,28 @@ export interface IUserDocument extends Document {
   roles?: IUserRoles;
 }
 
+export interface IUserPublicData extends Document {
+  _id: string | ObjectId;
+  authId: string | ObjectId;
+  profilePicture: string;
+  postsCount: number;
+  followersCount: number;
+  followingCount: number;
+  blocked: mongoose.Types.ObjectId[];
+  blockedBy: mongoose.Types.ObjectId[];
+  notifications: INotificationSettings;
+  social: ISocialLinks;
+  work: string;
+  school: string;
+  quote: string;
+  location: string;
+  bgImageVersion: string;
+  bgImageId: string;
+}
+
 export interface IUserRoles {
-    isAdmin: boolean;
-    permissions : string[];
+  isAdmin: boolean;
+  permissions: string[];
 }
 
 export interface IResetPasswordParams {
@@ -100,45 +120,66 @@ export interface IAllUsers {
   totalUsers: number;
 }
 
+export interface IUserJoinDocument {
+  _id: string | number | ObjectId;
+  username: string;
+  displayName: number;
+  uId: string;
+  email: string;
+  avatarColor: string;
+  createdAt: string;
+  postsCount: string;
+  work: number;
+  school: number;
+  quote: number;
+  location: number;
+  blocked: number;
+  blockedBy: number;
+  followersCount: number;
+  followingCount: number;
+  notifications: number;
+  social: number;
+  bgImageId: number;
+  profilePicture: number;
+  roles?: number;
+}
 
-export const initialUserdata = (id:string, uId:string, username: string, email:string, avatarColor:string) => {
-
-    return {
-        _id: id,
-        authId: id,
-        uId,
-        username,
-        email,
-        avatarColor,
-        profilePicture: '',
-        blocked: [],
-        blockedBy: [],
-        work: '',
-        location: '',
-        school: '',
-        quote:  '',
-        bgImageVersion: '',
-        bgImageId: '',
-        followersCount: 0,
-        followingCount: 0,
-        postCount:0,
-        notifications: {
-            messages: true,
-            reactions: true,
-            comments: true,
-            follows: true
-        },
-        roles: {
-            isAdmin: false,
-            permissions: []
-        },
-        social: {
-            facebook: '',
-            instagram: '',
-            twitter: '',
-            youtube: '',
-
-        }
-    } as unknown as IUserDocument;
-
+export const initialUserdata = (id: string, uId: string, username: string, displayName: string, email: string, avatarColor: string) => {
+  return {
+    _id: id,
+    authId: id,
+    uId,
+    displayName,
+    username,
+    email,
+    avatarColor,
+    profilePicture: '',
+    blocked: [],
+    blockedBy: [],
+    work: '',
+    location: '',
+    school: '',
+    quote: '',
+    bgImageVersion: '',
+    bgImageId: '',
+    followersCount: 0,
+    followingCount: 0,
+    postCount: 0,
+    notifications: {
+      messages: true,
+      reactions: true,
+      comments: true,
+      follows: true
+    },
+    roles: {
+      isAdmin: false,
+      permissions: []
+    },
+    social: {
+      facebook: '',
+      instagram: '',
+      twitter: '',
+      youtube: ''
+    }
+  } as unknown as IUserDocument;
 };

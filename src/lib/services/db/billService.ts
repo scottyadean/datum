@@ -1,21 +1,17 @@
 import Logger from 'bunyan';
 
 import { IBillBody, IBillDocument, ISessionDocument } from '../../../features/bills/interfaces/billsInterface';
-
-import { BillModel } from '../../../features/bills/models/billModel';
 import { SessionModel } from '../../../features/bills/models/sessionModel';
-import { RedisService } from './redisService';
-import { config } from '../../../config';
-import { Helpers } from '../../utils/helpers';
+import { BillModel } from '../../../features/bills/models/billModel';
 import { UserModel } from '../../../features/user/schemes/userSchema';
+import { Helpers } from '../../utils/helpers';
+import { config } from '../../../config';
 
 export class BillService{
 
-    public redisService: RedisService;
     public logger: Logger;
 
     constructor(){
-        this.redisService = new RedisService();
         this.logger = config.initLogger('bill-service');
     }
 
@@ -191,7 +187,7 @@ export class BillService{
                 return false;
             }
             bill.update({...data});
-            //await this.redisService.saveBill({ key: id, post: post });
+            //await this.BillCache.saveBill({ key: id, post: post });
             const res = await BillModel.updateOne({_id: `${id}`}, { ...data });
             return res.acknowledged;
         }catch(err){
@@ -229,13 +225,13 @@ export class BillService{
 
     public async getBillById(id:string, asJson=true) : Promise<string|IBillDocument|null> {
         try{
-            // const billjson = await this.redisService.getBill(`bill-${id}`);
+            // const billjson = await this.BillCache.getBill(`bill-${id}`);
             // if ( billjson! ){
             //     return billjson;
             // }
             const bill =  await BillModel.findById(id);
             if(bill) {
-                //this.redisService.setBill({key: id, post: post});
+                //this.BillCache.setBill({key: id, post: post});
                 return (asJson) ? JSON.stringify(bill) : bill;
             }
 
@@ -245,16 +241,6 @@ export class BillService{
 
         return '';
     }
-
-
-
-
-    private updateCount(count:string) : number {
-        let cnt =( +count ) as number;
-        return ( cnt += 1 ) as number;
-    }
-
-
 
 
 }

@@ -95,6 +95,7 @@ export interface IBillDocument extends Document {
         description: string;
         summary: string;
         body: [IBillBody];
+        introducedBy?: string;
         subjects: [IBillSubject];
         amendments: [IBillBody];
         contributors: [ IBillContributors ];

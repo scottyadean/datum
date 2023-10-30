@@ -11,12 +11,25 @@ declare global {
   }
 }
 
+
+export interface IAuthDocPartial {
+  uId?: string;
+  username?: string;
+  email?: string;
+  password?: string;
+  avatarColor?: string;
+  createdAt?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: number | string;
+};
+
 export interface AuthPayload {
   userId: string;
   uId: string;
   email: string;
   username: string;
   avatarColor: string;
+  isAdmin?: string|boolean;
   iat?: number;
   authId?: string;
 }

@@ -4,7 +4,6 @@ import mongoose, { Schema } from 'mongoose';
 
 import { Helpers } from '../../../lib/utils/helpers';
 
-
 export const billSchema: Schema = new Schema({
   sessionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Session', index: true },
   billHostId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
@@ -18,6 +17,7 @@ export const billSchema: Schema = new Schema({
   description: { type: String, default: '' },
   summary: { type: String, default: '' },
   body: { type: Array, default: [] },
+  introducedBy: { type: String, default: ''},
   sections: { type: Array, default: [] },
   amendments: { type: Array, default: [] },
   contributors: { type: Array, default: [] },
@@ -46,6 +46,4 @@ billSchema.pre('save', function (): void {
 });
 
 const BillModel: Model<IBillDocument> = model<IBillDocument>('Bill', billSchema, 'Bill');
-
-
 export {BillModel};

@@ -68,6 +68,7 @@ export class BillsController {
                     description: description,
                     summary: summary,
                     body: [],
+                    introducedBy: '',
                     subjects: [],
                     amendments: [],
                     contributors: [],

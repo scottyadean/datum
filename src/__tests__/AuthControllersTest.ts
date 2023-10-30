@@ -8,14 +8,25 @@
 // import { mocked } from 'ts-jest/utils';
 
 
+import { CryptUtil } from '../lib/utils/crypt';
+
+
 describe( 'signup', () => {
 
     beforeAll(()=>{
         // jest.mock( './features/services/db/cacheService' );
-        // jest.mock( './features/services/db/redisService' );
         // jest.mock( './features/services/queue/authQueue' );
         // jest.mock( './features/services/queue/mainQueue' );
         // jest.mock( './features/services/queue/userQueue' );
+    });
+
+
+    test('can encrypt/decrypt string', (done) => {
+        const encrypted = CryptUtil.encypt('hello world', 'scott');
+        const decrypted = CryptUtil.decrypt(encrypted, 'scott');
+        //console.log(encrypted, decrypted);
+        expect(decrypted).toBe('hello world');
+        done();
     });
 
 
