@@ -4,12 +4,12 @@ import { ObjectId } from 'mongodb';
 export interface IUserDocument extends Document {
   _id: string | ObjectId;
   authId: string | ObjectId;
+  uId?: string;
   username?: string;
   displayName?: string;
   email?: string;
   password?: string;
   avatarColor?: string;
-  uId?: string;
   postsCount: number;
   work: string;
   school: string;
@@ -31,6 +31,7 @@ export interface IUserDocument extends Document {
 export interface IUserPublicData extends Document {
   _id: string | ObjectId;
   authId: string | ObjectId;
+  uId?: string;
   profilePicture: string;
   postsCount: number;
   followersCount: number;

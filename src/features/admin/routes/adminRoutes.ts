@@ -1,25 +1,8 @@
-
-    import express, {Router} from 'express';
-
-
-    class AdminRoutes {
-        private router: Router;
-        constructor(){
-            //this.router = express.Router(routeHandler.prototype.action);
-        }
-    }
-
-    export const authRoutes:AuthRoutes = new AuthRoutes();
+import express, { Router } from 'express';
+import { AdminController } from '../controllers/adminController';
 
 
-
-
-import express, {Router} from 'express';
-import { BillsController } from '../controllers/billsController';
-import { SessionController } from '../controllers/sessionController';
-
-
-class BillRoutes {
+class AdminRoutes {
 
     private router: Router;
     private authRouter: Router;
@@ -32,21 +15,14 @@ class BillRoutes {
 
     //open routes
     public routes():Router {
-        this.router.get('/session/index', SessionController.prototype.index );
-        this.router.get('/session/read/:slug', SessionController.prototype.read );
-
-        this.router.get('/bill/index/:session_id',  BillsController.prototype.index );
-        this.router.get('/bill/read/:id',  BillsController.prototype.read );
-
+        // this.router.get('/admin/index/:session_id',  AdminController.prototype.index );
+        this.router.get('/routes',  AdminController.prototype.routes );
         return this.router;
     }
 
     public authRoutes():Router {
-        this.authRouter.post('/session/create', SessionController.prototype.create);
-        this.authRouter.post('/bill/create',  BillsController.prototype.create );
-        this.authRouter.put('/bill/body/update',  BillsController.prototype.billBodyUpsert );
-        this.authRouter.put('/bill/contributor', BillsController.prototype.editContributor);
-
+        this.authRouter.get('/index', AdminController.prototype.index );
+        this.authRouter.put('/user/roles', AdminController.prototype.updateRoles );
         return this.authRouter;
     }
 
@@ -54,4 +30,4 @@ class BillRoutes {
 
 }
 
-export const billRoutes:BillRoutes = new BillRoutes();
+export const adminRoutes:AdminRoutes = new AdminRoutes();

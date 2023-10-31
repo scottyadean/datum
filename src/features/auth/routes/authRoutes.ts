@@ -1,5 +1,5 @@
 
-import express, {Router} from 'express';
+import express, { Router } from 'express';
 import { SignUp } from '../controllers/signup';
 import { SignIn } from '../controllers/signin';
 import { SignOut } from '../controllers/signout';
@@ -35,6 +35,8 @@ class AuthRoutes {
     }
 
 
+
+    
 }
 
 

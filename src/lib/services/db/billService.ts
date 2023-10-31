@@ -15,10 +15,18 @@ export class BillService{
         this.logger = config.initLogger('bill-service');
     }
 
-    public async getSessions(): Promise<Array<ISessionDocument>|null>{
+    public async sessionIndex(year:Number|null, years?:Array<number>|null): Promise<Array<ISessionDocument>|null>{
         try{
-           const sess = await SessionModel.find({year: new Date().getFullYear() });
-           console.log(sess);
+
+            interface  q { year? : Number|null, years?: { $in: Array<number>|null }  };
+            let query: q = {  };
+
+            if( year ) { query.year =  year;}
+            if( years ){ query.years = { $in: years };
+
+        }
+            
+           const sess = await SessionModel.find(query);
            return sess;
         } catch(err){
             this.logger.error(err);

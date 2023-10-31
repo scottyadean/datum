@@ -53,7 +53,7 @@ export class SignUp {
     authQueue.addAuthUserJob({ value: authData });
 
     // omit the auth data from the public user data.
-    omit(userData, ['uId', 'username', 'email', 'avatarColor', 'password', 'passwordResetToken', 'passwordResetExpires']);
+    omit(userData, ['username', 'email', 'avatarColor', 'password', 'passwordResetToken', 'passwordResetExpires']);
     userQueue.addUserJob({ value: userData });
 
     //assign the user to the current session

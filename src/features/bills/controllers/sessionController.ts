@@ -14,9 +14,11 @@ const service: BillService = new BillService();
 export class SessionController {
 
 
-    public async index ( _req: Request, res: Response ): Promise<void> {
+    public async index ( req: Request, res: Response ): Promise<void> {
         try{
-            const sess = await service.getSessions();
+            const year = ( req.query.year ) ? parseInt(`${req.query.year}`) : null; 
+            const years = ( req.query.years ) ? `${req.query.years}`.split('|').map(y=>parseInt(`${y}`)) : null; 
+            const sess = await service.sessionIndex(year, years);
             res.status(HTTP_STATUS.OK).json( { result: sess, error: null  } );
         }catch(err){
             res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );

@@ -40,7 +40,7 @@ class AuthMiddleWare {
             throw new NoAuthError('no auth');
         }
 
-        if(!req.currentUser.isAdmin){
+        if(!req.currentUser.admin){
             throw new NoAuthError('not admin');
         }
 

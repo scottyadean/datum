@@ -30,6 +30,7 @@ export interface AuthPayload {
   username: string;
   avatarColor: string;
   isAdmin?: string|boolean;
+  admin?: string|boolean;
   iat?: number;
   authId?: string;
 }

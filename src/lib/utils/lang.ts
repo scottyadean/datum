@@ -28,5 +28,16 @@ export class Lang{
         return { result: null, error: `${error}` };
     }
 
+    // static defaultRespone(  ){
+
+    //     try{
+    //         const users = await adminService.index( );
+    //         res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes(users) );
+    //     }catch(err){
+    //         res.status(HTTP_STATUS.BAD_REQUEST).json(  Lang.defaultErrorRes(`${err}`) );
+    //     }
+
+    // }
+
 
 }

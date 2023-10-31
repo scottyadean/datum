@@ -4,6 +4,7 @@ import { IUserDocument } from '../../../../features/user/interfaces/userInterfac
 import { ServerError } from '../../../utils/errors';
 import { Helpers } from '../../../utils/helpers';
 import { config } from '../../../../config';
+import { UserModel } from '../../../../features/user/schemes/userSchema';
 
 export class UserCache extends CacheService {
 
@@ -47,11 +48,20 @@ export class UserCache extends CacheService {
     }
   }
 
-  public async getUserFromCache(key: string) : Promise<Partial<IUserDocument>|null>  {
+  public async getUserFromCache(key: string): Promise<Partial<IUserDocument>|null>  {
     const output : Partial<IUserDocument> = {};
     try{
         await this.checkConnection();
         const user: IUserDocument = await this.client.HGETALL(`users:${key}`) as unknown as IUserDocument;
+
+        if(!user){
+          const usr: IUserDocument = await UserModel.findById({ _id: key }) as IUserDocument;
+          if ( usr ){
+            await this.saveUserToCache(`${key}`, `${usr.uId}`, usr);
+          }
+          return usr; 
+        }
+
         const parser = {  'blocked': 1,
                           'blockedBy': 1,
                           'notifications': 1,
@@ -65,7 +75,7 @@ export class UserCache extends CacheService {
           }
     }catch(err){
         this.logger.error(err);
-        throw new ServerError('no user cache found');
+        throw new ServerError('error retrieving user from cache');
     }
 
     if( Object.keys( output ).length === 0 ){
@@ -104,7 +114,7 @@ export class UserCache extends CacheService {
       'username', `${username}`,
       'email', `${email}`,
       'createdAt', `${createdAt}`,
-      'postsCount', `${postsCount}`
+      'postsCount', `${postsCount || 0}`
     ];
     const blockData: string[] = [
         'blocked', JSON.stringify(blocked),
