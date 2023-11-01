@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 //import {joiValidation} from '../../../lib/decorators/authValidation';
 import { SOCKET_SERVER } from '../../../lib/sockets/BaseSockets';
 import HTTP_STATUS from 'http-status-codes';
@@ -150,26 +150,13 @@ export class PostsController {
     }
 
 
-    public async saveComment(req: Request, res: Response) : Promise<void> {
+    public async comment(req: Request, res: Response, next: NextFunction) : Promise<void> {
 
         try{
-            // const { id, to, comment  } = req.body;
-
-            // const user = this.userService.getAuthUser();
-            // const data: ICommentDocument = {
-            //     _id: new ObjectId(),
-            //     username: `${user?.username}`,
-            //     postId: `${id}`,
-            //     profilePicture:
-            //     comment: comment,
-            //     userTo: `${to}`
-            // } as ICommentDocument;
-
-
-            //const postCommentCache: PostCommentCache = new PostCommentCache();
-            //await postCommentCache.savePostCommentCache(id, JSON.stringify(data));
-
-            res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes('wip') );
+            const { id, comment  } = req.body;
+            const user = req.currentUser;
+            const result = null //postService.saveComment( id, comment, user );
+            res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes( result ) );
         }catch(err){
             res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
         }

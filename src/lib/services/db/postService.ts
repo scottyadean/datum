@@ -5,6 +5,7 @@ import { PostReactionsModel } from '../../../features/posts/models/postReactions
 import { PostsModel } from '../../../features/posts/models/postsModel';
 import { PostCache } from '../cache/posts/postCache';
 import { config } from '../../../config';
+import { IAuthDocument } from '../../../features/auth/interfaces/authInterface';
 
 
 
@@ -40,6 +41,25 @@ export class PostService{
             this.logger.error(err);
         }
         return false;
+    }
+
+
+    public async saveComment(postId:string, comment:string, user:IAuthDocument|undefined){
+
+            // const data: ICommentDocument = {
+            //     _id: new ObjectId(),
+            //     username: `${user?.username}`,
+            //     postId: `${id}`,
+            //     profilePicture:
+            //     comment: comment,
+            //     userTo: `${to}`
+            // } as ICommentDocument;
+
+
+            //const postCommentCache: PostCommentCache = new PostCommentCache();
+            //await postCommentCache.savePostCommentCache(id, JSON.stringify(data));
+
+
     }
 
 
