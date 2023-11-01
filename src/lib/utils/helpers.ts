@@ -23,7 +23,13 @@ export class Helpers{
 
     static randomHash(len=23) : string {
         const p = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        return [...Array(len)].reduce(a=>a+p[~~(Math.random()*p.length)],'');
+        return [...Array(len)].reduce(a=>a+p[~~(Math.random()*p.length)], '');
+    }
+
+
+    static randomIntHash(len=23) : string {
+        const p = '0123456789';
+        return [...Array(len)].reduce(a=>a+p[~~(Math.random()*p.length)], '');
     }
 
 

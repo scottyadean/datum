@@ -56,6 +56,7 @@ class UserService{
         }
     }
 
+
     /**
      * return a join aggregate
      * @returns {*}

@@ -1,14 +1,17 @@
 import { ObjectId } from 'mongodb';
 import { Request, Response } from 'express';
 //import {joiValidation} from '../../../lib/decorators/authValidation';
-import HTTP_STATUS from 'http-status-codes';
-import { IPostDocument, IReactionPostRequest } from '../interfaces/postsInterface';
-import { PostCache } from '../../../lib/services/cache/posts/postCache';
-import { IAuthDocument } from '../../auth/interfaces/authInterface';
 import { SOCKET_SERVER } from '../../../lib/sockets/BaseSockets';
-import { postQueue } from '../../../lib/services/queue/postQueue';
+import HTTP_STATUS from 'http-status-codes';
+
+import { IPostDocument, IReactionPostRequest } from '../interfaces/postsInterface';
+import { IAuthDocument } from '../../auth/interfaces/authInterface';
 import { PostService } from '../../../lib/services/db/postService';
+import { PostCommentCache } from '../../../lib/services/cache/posts/postCommentCache';
+import { postQueue } from '../../../lib/services/queue/postQueue';
+import { PostCache } from '../../../lib/services/cache/posts/postCache';
 import { Lang } from '../../../lib/utils/lang';
+import { ICommentDocument } from '../interfaces/postCommentInterface';
 
 const postService: PostService = new PostService();
 const postCache: PostCache = new PostCache();
@@ -144,6 +147,33 @@ export class PostsController {
         }catch(err){
             res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
         }
+    }
+
+
+    public async saveComment(req: Request, res: Response) : Promise<void> {
+
+        try{
+            // const { id, to, comment  } = req.body;
+
+            // const user = this.userService.getAuthUser();
+            // const data: ICommentDocument = {
+            //     _id: new ObjectId(),
+            //     username: `${user?.username}`,
+            //     postId: `${id}`,
+            //     profilePicture:
+            //     comment: comment,
+            //     userTo: `${to}`
+            // } as ICommentDocument;
+
+
+            //const postCommentCache: PostCommentCache = new PostCommentCache();
+            //await postCommentCache.savePostCommentCache(id, JSON.stringify(data));
+
+            res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes('wip') );
+        }catch(err){
+            res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
+        }
+
 
     }
 

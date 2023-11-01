@@ -12,6 +12,7 @@ import { authService } from '../../../lib/services/db/authService';
 import { authQueue } from '../../../lib/services/queue/authQueue';
 import { userQueue } from '../../../lib/services/queue/userQueue';
 import { UserCache } from '../../../lib/services/cache/users/UserCache';
+import { Helpers } from '../../../lib/utils/helpers';
 import { config } from '../../../config';
 import { Lang } from '../../../lib/utils/lang';
 
@@ -34,19 +35,27 @@ export class SignUp {
 
   //@authValidation(signupSchema)
   public async create(req: Request, res: Response): Promise<void> {
+    // get post params
     const { username, email, password, avatarColor, displayName } = req.body;
+
+    // make sure user is not in db.
     const checkIfUserExists: IAuthDocument = await authService.getUserByUserNameorEmail(username, email);
     if (checkIfUserExists) {
       throw new BadRequestError('Invalid creds');
     }
 
+    // create the ids.
     const authObjectId: ObjectId = new ObjectId();
     //const userObjectId: ObjectId = new ObjectId();
-    const uId = `${new Date().getTime()}`;
+    const uId = `${new Date().getTime()}${Helpers.randomIntHash()}`;
+
+    // collect the private auth data to store in the Auth model
     const authData: IAuthDocument = SignUp.signUpData({ _id: authObjectId, uId, username, email, password, avatarColor });
 
-    // Store User profile in Cache
+    // Fill in intal user profile data
     const userData: IUserDocument = initialUserdata(`${authObjectId}`, uId, username, displayName, email, avatarColor);
+
+    // Store User profile in Cache
     userCache.saveUserToCache(`${authObjectId}`, uId, userData);
 
     // Add to user Database minus the sensitive auth data

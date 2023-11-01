@@ -42,6 +42,19 @@ export class PostService{
         return false;
     }
 
+
+    public async incrementCommentCount( id:string ){
+        try{
+            const post = await PostsModel.findOneAndUpdate( {_id: `${id}`}, { $inc: { commentsCount: 1 } }  );
+            if( !post ){ return false; }
+            await this.postCache.savePostCache({ key: id, post: post });
+
+        }catch(err){
+            this.logger.error(err);
+        }
+    }
+
+
     public async getPostById(id:string) : Promise<string> {
         try{
             const postjson = await this.postCache.getPostFromCache(`post-${id}`);

@@ -52,7 +52,23 @@ export class BillsController {
          */
         public async create(req: Request, res: Response) : Promise<void> {
             try{
-                const { session_id, name, state, title, catagory, sub_catagory, description, summary } = req.body;
+                const { session_id, name, body, type, state, title, subTitle, catagory, sub_catagory, description, summary } = req.body;
+
+
+                const billBody:IBillBody = {
+
+                    id: new ObjectId(),
+                    type: type,
+                    title: title,
+                    subTitle: subTitle,
+                    body: body,
+                    status: 'init',
+                    style: 'base',
+                    version: 1,
+
+                } as IBillBody;
+
+
                 const id : ObjectId = new ObjectId();
                 const user = req.currentUser as IAuthDocument;
                 const newBill: IBillDocument = {
@@ -67,7 +83,7 @@ export class BillsController {
                     subCatagory:sub_catagory,
                     description: description,
                     summary: summary,
-                    body: [],
+                    body: [billBody],
                     introducedBy: '',
                     subjects: [],
                     amendments: [],

@@ -1,45 +1,32 @@
-import Logger from 'bunyan';
 import { CacheService } from '../../../services/db/cacheService';
-import { ICommentDocument } from '../../../../features/posts/interfaces/postCommentInterface';
+//import { ICommentDocument } from '../../../../features/posts/interfaces/postCommentInterface';
 import { ServerError } from '../../../utils/errors';
-import { config } from '../../../../config';
-
-
-
+import { PostService } from '../../db/postService';
 
 export class PostCommentCache extends CacheService {
 
-    public logger: Logger;
+    public postService: PostService;
 
     constructor(){
-        super();
-        this.logger = config.initLogger('post-comment-cache');
+        super('post-comment-cache');
+        this.postService = new PostService();
     }
 
-    async connect(): Promise<void> {
-        try {
-          await this.client.connect();
-        } catch (error) {
-          this.logger.error(error);
-        }
-      }
 
       /**
        * Save post comment to cache.
-       * @param key string cache key
+       * @param postId string cache key
        * @param data strinify post comment contents
        */
-      public async savePostCommentCache(key: string, data: string) : Promise<void> {
+      public async savePostCommentCache(postId: string, data: string) : Promise<void> {
         try {
-            if ( !this.client.isOpen ){ await this.connect(); }
-            await this.client.LPUSH(`post-comment-${key}`, data );
+            await this.checkConnection();
+            await this.client.LPUSH(`post-comment-${postId}`, data);
+            await this.postService.incrementCommentCount(`${postId}`);
         } catch (error) {
-            this.logger.error(error);
+            this.log.error(error);
             throw new ServerError('could not save post comment cache');
         }
       }
-
-
-
 }
 

@@ -1,32 +1,13 @@
-import Logger from 'bunyan';
 import { CacheService } from '../../db/cacheService';
 import { IUserDocument } from '../../../../features/user/interfaces/userInterface';
 import { ServerError } from '../../../utils/errors';
 import { Helpers } from '../../../utils/helpers';
-import { config } from '../../../../config';
 import { UserModel } from '../../../../features/user/schemes/userSchema';
 
 export class UserCache extends CacheService {
 
-  public logger: Logger;
-
   constructor() {
-    super();
-    this.logger = config.initLogger('post-service');
-  }
-
-  async connect(): Promise<void> {
-    try {
-      await this.client.connect();
-    } catch (error) {
-      this.logger.error(error);
-    }
-  }
-
-  async checkConnection(): Promise<void> {
-    if ( !this.client.isOpen ){
-        await this.connect();
-    }
+    super('user-service-cache');
   }
 
   /**
@@ -43,7 +24,7 @@ export class UserCache extends CacheService {
         await this.client.ZADD('user', { score: parseInt(userId, 10), value: `${key}` });
         await this.client.hSet(`users:${key}`, userData);
     } catch (error) {
-        this.logger.error(error);
+        this.log.error(error);
         throw new ServerError('could not save user cache!');
     }
   }
@@ -59,7 +40,7 @@ export class UserCache extends CacheService {
           if ( usr ){
             await this.saveUserToCache(`${key}`, `${usr.uId}`, usr);
           }
-          return usr; 
+          return usr;
         }
 
         const parser = {  'blocked': 1,
@@ -74,7 +55,7 @@ export class UserCache extends CacheService {
             }
           }
     }catch(err){
-        this.logger.error(err);
+        this.log.error(err);
         throw new ServerError('error retrieving user from cache');
     }
 
