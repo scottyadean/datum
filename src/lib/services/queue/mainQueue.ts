@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Queue, { Job } from 'bull';
 import Logger from 'bunyan';
 import { createBullBoard } from '@bull-board/api';
 import { BullAdapter } from '@bull-board/api/bullAdapter';
 import { ExpressAdapter } from '@bull-board/express';
-import { config } from '../../../config';
+import { config } from '@conf/config';
+
 
 export let bullAdapters: BullAdapter[] = [];
 export let serverAdapter: ExpressAdapter;
@@ -25,9 +27,9 @@ export abstract class MainQueue {
         });
 
         this.log = config.initLogger(`queue-${name}`);
-
         this.queue.on( 'completed', (job: Job)=>{
-            job.remove();
+            //job.remove();
+            this.log.info( job.data );
             this.log.info(' job removed from log ');
         });
 

@@ -2,7 +2,7 @@ import { MainQueue } from './mainQueue';
 import {UploadService} from '../../services/db/uploadService';
 import { DoneCallback, Job } from 'bull';
 import Logger from 'bunyan';
-import {config} from '../../../config';
+import {config} from '../../../config/config';
 
 const log: Logger = config.initLogger('authWorker');
 const imgUpload : UploadService = new UploadService();

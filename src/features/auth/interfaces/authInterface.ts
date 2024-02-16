@@ -1,7 +1,6 @@
 import { Document } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { IUserDocument } from '../../user/interfaces/userInterface';
-//import { IUserDocument } from '@user/interfaces/user.interface';
 
 declare global {
   namespace Express {
@@ -44,6 +43,7 @@ export interface IAuthDocument extends Document {
   password?: string;
   avatarColor: string;
   createdAt: Date;
+  roles?: string,
   passwordResetToken?: string;
   passwordResetExpires?: number | string;
   comparePassword(password: string): Promise<boolean>;
@@ -58,6 +58,8 @@ export interface ISignUpData {
   password: string;
   avatarColor: string;
 }
+
+
 
 export interface IAuthJob {
   value?: string | IAuthDocument | IUserDocument;

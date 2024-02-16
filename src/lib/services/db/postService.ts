@@ -1,12 +1,16 @@
 import Logger from 'bunyan';
+import { ObjectId } from 'mongodb';
+import { IPostDocument, IReactionPostRequest, IPostReactionDocument, IReactions } from '@features/posts/interfaces/postsInterface';
+import { ICommentDocument } from '@features/posts/interfaces/postCommentInterface';
+import { AuthPayload } from '@features/auth/interfaces/authInterface';
 
-import { IPostDocument, IReactionPostRequest, IPostReactionDocument, IReactions } from '../../../features/posts/interfaces/postsInterface';
-import { PostReactionsModel } from '../../../features/posts/models/postReactionsModel';
-import { PostsModel } from '../../../features/posts/models/postsModel';
-import { PostCache } from '../cache/posts/postCache';
-import { config } from '../../../config';
-import { IAuthDocument } from '../../../features/auth/interfaces/authInterface';
+import { PostsModel } from '@features/posts/models/postsModel';
+import { PostReactionsModel } from '@features/posts/models/postReactionsModel';
+import { PostCommentsModel } from '@features/posts/models/postCommentModel';
 
+import { PostCache } from '@lib/services/cache/posts/postCache';
+import { PostCommentCache } from '@lib/services/cache/posts/postCommentCache';
+import { config } from '@conf/config';
 
 
 export class PostService{
@@ -31,34 +35,40 @@ export class PostService{
         try{
             const post = await PostsModel.findOne({_id: `${id}`});
             if ( !post || `${post?.userId}` !== `${uid}` ){
+                this.logger.error('can not update post, because you are not owner');
                 return false;
             }
+
             post.update({...data});
             await this.postCache.savePostCache({ key: id, post: post });
-            const res = await PostsModel.updateOne({_id: `${id}`}, { ...data });
+            const res = await PostsModel.updateOne({_id: `${id}`}, { ...data }, { upsert: true }).exec();
+            this.logger.info('post updated..');
             return res.acknowledged;
+
         }catch(err){
             this.logger.error(err);
         }
+        this.logger.error('no action');
         return false;
     }
 
 
-    public async saveComment(postId:string, comment:string, user:IAuthDocument|undefined){
+    public async saveComment(postId:string,
+                             comment:string,
+                             user:AuthPayload|null) : Promise<ICommentDocument> {
 
-            // const data: ICommentDocument = {
-            //     _id: new ObjectId(),
-            //     username: `${user?.username}`,
-            //     postId: `${id}`,
-            //     profilePicture:
-            //     comment: comment,
-            //     userTo: `${to}`
-            // } as ICommentDocument;
+            const data: ICommentDocument = {
+                _id: new ObjectId(),
+                username: `${user?.username}`,
+                userId: `${user.userId}`,
+                postId: `${postId}`,
+                comment: comment
+            } as ICommentDocument;
 
-
-            //const postCommentCache: PostCommentCache = new PostCommentCache();
-            //await postCommentCache.savePostCommentCache(id, JSON.stringify(data));
-
+            const postCommentCache: PostCommentCache = new PostCommentCache();
+            await postCommentCache.savePostCommentCache(postId, JSON.stringify(data));
+            await PostCommentsModel.create(data);
+            return data;
 
     }
 
@@ -68,7 +78,6 @@ export class PostService{
             const post = await PostsModel.findOneAndUpdate( {_id: `${id}`}, { $inc: { commentsCount: 1 } }  );
             if( !post ){ return false; }
             await this.postCache.savePostCache({ key: id, post: post });
-
         }catch(err){
             this.logger.error(err);
         }

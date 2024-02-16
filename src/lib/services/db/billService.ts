@@ -1,40 +1,54 @@
 import Logger from 'bunyan';
-
-import { IBillBody, IBillDocument, ISessionDocument } from '../../../features/bills/interfaces/billsInterface';
-import { SessionModel } from '../../../features/bills/models/sessionModel';
-import { BillModel } from '../../../features/bills/models/billModel';
-import { UserModel } from '../../../features/user/schemes/userSchema';
+import { ObjectId } from 'mongodb';
+import { config } from '../../../config/config';
 import { Helpers } from '../../utils/helpers';
-import { config } from '../../../config';
+import { BillModel } from '../../../features/bills/models/billModel';
+import { UserModel } from '../../../features/user/models/userModel';
+import { SessionModel } from '../../../features/bills/models/sessionModel';
+import { IBillBody, IBillDocument, ISessionDocument } from '../../../features/bills/interfaces/billsInterface';
+//
 
 export class BillService{
-
     public logger: Logger;
 
+    /**
+     * init the logger to use with class methods
+     */
     constructor(){
         this.logger = config.initLogger('bill-service');
     }
 
-    public async sessionIndex(year:Number|null, years?:Array<number>|null): Promise<Array<ISessionDocument>|null>{
+    /**
+     * @function sessionIndex
+     * @description List all sessions, add year or array of years to filter
+     * @param year integer year to filter by not required
+     * @param years array integers by year to filter by not required
+     * @returns promise
+     */
+    public async sessionIndex(year:number|null,
+                              years:Array<number>|null,
+                              active:boolean|null) : Promise<Array<ISessionDocument>|null>{
         try{
-
-            interface  q { year? : Number|null, years?: { $in: Array<number>|null }  };
-            let query: q = {  };
-
+            interface  q { year? : number|null|{ $in: Array<number>|null }, active?:boolean|null  };
+            const query: q = {  };
             if( year ) { query.year =  year;}
-            if( years ){ query.years = { $in: years };
-
-        }
-            
-           const sess = await SessionModel.find(query);
-           return sess;
-        } catch(err){
+            if( years ){ query.year = { '$in': years }; }
+            if ( active ) { query.active = true;}
+            const sess = await SessionModel.find(query);
+            return sess;
+        }catch(err){
             this.logger.error(err);
             console.log(err);
         }
         return null;
     }
 
+    /**
+     * @function saveSession
+     * @description Save session to database
+     * @param session session document to save
+     * @return promise
+     */
     public async saveSession(session:ISessionDocument): Promise<void>{
         try{
             await SessionModel.create(session);
@@ -168,9 +182,15 @@ export class BillService{
     }
 
 
-    public async getBills(sessionId:string): Promise<Array<IBillDocument>|null>{
+    public async getBills(sid:string): Promise<Array<IBillDocument>|null>{
+
+        this.logger.info(sid);
+
         try{
-            const docs = await BillModel.find({ sessionId: sessionId });
+            const docs = await BillModel.find({sessionId: new ObjectId(sid) });
+
+            console.log(docs);
+
             return docs;
         } catch(err){
             this.logger.error(err);

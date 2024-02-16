@@ -21,10 +21,13 @@ export interface IBillContributors {
 
 
 export interface IBillSponsors{
+        profile_id: string | ObjectId;
+        origin_id: string|null;
+        order: number;
         type: string;
         title: string;
         name: string;
-
+        img: string;
 }
 
 export interface IBillNote {
@@ -62,9 +65,17 @@ export interface IBillSectionsAffected{
 }
 
 
+/**
+ * "@Document_Type": "F",
+ * "@Document_Format": "PDF",
+ * "@Description": "FISCAL NOTE: As Introduced",
+ * "@Last_Updated": "2023-01-09T11:15:10.727",
+ * "@URL": "legtext/56leg/1R/fiscal/HB2003.DOCX.pdf"
+ */
 export interface IBillDocuments{
         filename: string;
         catagory: string;
+        updated_at: Date;
         paths: [{ format: string, link: string }];
 }
 
@@ -75,15 +86,43 @@ export interface IBillVideos{
         format?: string;
 }
 
-export interface IBillSubject{
+export interface IBillSection{
         name: string;
         url: string;
         description: string;
 }
 
+export interface IBillHouseMeta {
+        House_1st_Read: Date|null;
+        House_Official: string;
+        House_2nd_Read: Date|null;
+        House_Consent_Calendar_Date: Date|null;
+        House_Consent_Calendar_Object: string;
+        House_Maj_Caucus_Ind: string;
+        House_Min_Caucus_Ind: string;
+        House_Maj_Caucus_Date: Date|null;
+        House_Min_Caucus_Date: Date|null;
+}
+
+export interface IBillSenateMeta {
+        Senate_1st_Read: Date|null;
+        Senate_Official: string;
+        Senate_2nd_Read: Date|null;
+        Senate_Consent_Calendar_Object: string;
+}
+
+
+
+export interface ITransmitTo {
+        body: string;
+        date: Date;
+        Ind: string;
+}
+
 export interface IBillDocument extends Document {
         _id: string | ObjectId;
         sessionId: string| ObjectId;
+        sessionOriginId?: number|null;
         billHostId: string| ObjectId;
         billNumber: string;
         slug?: string;
@@ -95,19 +134,26 @@ export interface IBillDocument extends Document {
         description: string;
         summary: string;
         body: [IBillBody];
+        currentBody?: string;
+        houseMeta?: IBillHouseMeta|null;
+        senateMeta?: IBillSenateMeta|null;
+        introducedAt?: Date|null;
         introducedBy?: string;
-        subjects: [IBillSubject];
+        sections: [IBillSection];
         amendments: [IBillBody];
         contributors: [ IBillContributors ];
         sponsors: [IBillSponsors];
         requestsToEdit: [IBillContributors];
         notes: [IBillNote];
-        votesHouse: [IBillVote];
-        votesSenate: [IBillVote];
+        votes: [IBillVote];
         keywords: [IBillKeywords];
+        journalGov?: string;
+        postingSheet?: string;
+        nowPartOf?: string;
         documents: [IBillDocuments];
         videos: [IBillVideos];
         sectionsAffected: [IBillSectionsAffected];
+        transmitTo: ITransmitTo|null;
         submitted?: boolean;
         submittedAt?: Date|null;
         deleted?: boolean|null;
@@ -116,16 +162,35 @@ export interface IBillDocument extends Document {
 }
 
 
+
+/**
+ * ---------------------------------
+ * Data Modal from az.gov
+ * -------------------------------------
+ *  "@Session_ID": "127",
+ *  "@Session_Full_Name": "Fifty-sixth Legislature - First Regular Session",
+ *  "@Legislature": "56",
+ *  "@Session": "1R",
+ *  "@Legislation_Year": "2023",
+ *  "@Session_Start_Date": "2023-01-09T12:00:00",
+ *  "@Sine_Die_Date": "2023-07-31T17:15:00"
+ *
+ */
 export interface ISessionDocument extends Document {
-        _id: string | ObjectId;
-        name: string;
-        state:string;
-        year: number;
-        slug?: string;
-        description: string;
-        start_date: Date;
-        end_date: Date;
-        special: string;
-        extended?:Date|null;
-        createdAt: Date;
+                _id: string | ObjectId;
+                slug?: string; // "@Session_Full_Name" formated
+                origin_id?: number|null, //"@Session_ID": "127",
+                name: string; // "@Session_Full_Name"
+                description: string; // "@Session_Full_Name"
+                state:string; // AZ
+                year: number; // "@Legislation_Year"
+                start_date: Date; // "@Session_Start_Date"
+                end_date: Date; // "@Sine_Die_Date"
+                sesson: string; // "@Session"
+                notes?: string;
+                active: boolean;
+                extended?:Date|null;
+                createdAt: Date;
 }
+
+

@@ -54,7 +54,7 @@ export interface IQueryDeleted {
 export interface IReactions {
   like: number;
   love: number;
-  haha: number;
+  lol: number;
   wow: number;
   sad: number;
   angry: number;

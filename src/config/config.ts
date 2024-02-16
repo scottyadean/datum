@@ -6,7 +6,6 @@ dotenv.config({});
 class Config {
 
   public APP_NAME: string|undefined;
-
   public DBHOST: string | undefined;
   public ENV: string | undefined;
   public NODE_ENV: string | undefined;

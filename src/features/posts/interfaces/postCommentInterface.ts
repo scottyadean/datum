@@ -1,22 +1,23 @@
+import { AuthPayload } from '@features/auth/interfaces/authInterface';
 import { ObjectId } from 'mongodb';
 import { Document } from 'mongoose';
 
 export interface ICommentDocument extends Document {
-  _id?: string | ObjectId;
+  _id?: string|ObjectId;
   username: string;
+  userId: string|ObjectId;
   postId: string;
-  profilePicture: string;
   comment: string;
   createdAt?: Date;
   userTo?: string | ObjectId;
 }
 
 export interface ICommentJob {
-  postId: string;
-  userTo: string;
-  userFrom: string;
-  username: string;
-  comment: ICommentDocument;
+  value: {
+      id: string;
+      comment: string;
+      user: AuthPayload;
+  }
 }
 
 export interface ICommentNameList {

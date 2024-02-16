@@ -1,16 +1,15 @@
+
 import { ObjectId } from 'mongodb';
-import { NextFunction, Request, Response } from 'express';
-//import {joiValidation} from '../../../lib/decorators/authValidation';
-import { SOCKET_SERVER } from '../../../lib/sockets/BaseSockets';
+import { Request , Response } from 'express';
+import { SOCKET_SERVER } from '@lib/sockets/BaseSockets';
 import HTTP_STATUS from 'http-status-codes';
 
 import { IPostDocument, IReactionPostRequest } from '../interfaces/postsInterface';
 import { IAuthDocument } from '../../auth/interfaces/authInterface';
-import { PostService } from '../../../lib/services/db/postService';
-import { PostCommentCache } from '../../../lib/services/cache/posts/postCommentCache';
-import { postQueue } from '../../../lib/services/queue/postQueue';
-import { PostCache } from '../../../lib/services/cache/posts/postCache';
-import { Lang } from '../../../lib/utils/lang';
+import { PostService } from '@lib/services/db/postService';
+import  PostQueue  from '@lib/services/queue/postQueue';
+import { PostCache } from '@lib/services/cache/posts/postCache';
+import { Lang } from '@lib/utils/lang';
 import { ICommentDocument } from '../interfaces/postCommentInterface';
 
 const postService: PostService = new PostService();
@@ -47,7 +46,7 @@ export class PostsController {
                 reactions: {
                     like: 0,
                     love: 0,
-                    haha: 0,
+                    lol: 0,
                     sad: 0,
                     wow: 0,
                     angry: 0
@@ -58,10 +57,9 @@ export class PostsController {
             postCache.savePostCache({key: id, post: newPost});
             //emit socket message
             SOCKET_SERVER.emit('new-post', post);
-
             //save the post to the db. thru the queue
+            const postQueue: PostQueue = new PostQueue('post');
             postQueue.addPostJob({ value: newPost } );
-
             //return success
             res.status(HTTP_STATUS.OK).json( { result: Lang.createOk('Post'), newPost } );
         }catch(err){
@@ -79,7 +77,7 @@ export class PostsController {
         try{
             const { id,  data  } = req.body;
             const uid = req.currentUser?.userId;
-            const result = await postService.updatePost(id, uid!, data);
+            const result = await postService.updatePost(id, `${uid}`, data);
             res.status(HTTP_STATUS.OK).json( { result, id, uid, data, error:null  } );
         }catch(err){
             res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
@@ -150,13 +148,15 @@ export class PostsController {
     }
 
 
-    public async comment(req: Request, res: Response, next: NextFunction) : Promise<void> {
+    public async comment(req: Request, res: Response) : Promise<void> {
 
         try{
             const { id, comment  } = req.body;
             const user = req.currentUser;
-            const result = null //postService.saveComment( id, comment, user );
-            res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes( result ) );
+            const postQueue: PostQueue = new PostQueue('postcomment');
+            postQueue.addPostCommentJob({ value: { id, comment, user } } );
+            //const result = await postService.saveComment( id, comment, user! );
+            res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes( { id, comment } ) );
         }catch(err){
             res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
         }

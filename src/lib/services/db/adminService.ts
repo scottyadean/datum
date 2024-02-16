@@ -1,7 +1,7 @@
 import Logger from 'bunyan';
-import { IUserDocument, IUserRoles } from '../../../features/user/interfaces/userInterface';
-import { UserModel } from '../../../features/user/schemes/userSchema';
-import { config } from '../../../config';
+import { IUserDocument, UserRolesInterface } from '@features/user/interfaces/userInterface';
+import { UserModel } from '@features/user/models/userModel';
+import { config } from '@conf/config';
 
 class AdminService{
 
@@ -17,9 +17,8 @@ class AdminService{
         return user;
     }
 
-    public async updateUserRoles(id:string, roles:IUserRoles): Promise<boolean> {
+    public async updateUserRoles(id:string, roles:UserRolesInterface): Promise<boolean> {
         await UserModel.updateOne({_id: id} , { roles: roles});
-        
         return true;
     }
 

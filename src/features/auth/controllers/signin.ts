@@ -5,21 +5,24 @@ import JWT from 'jsonwebtoken';
 import { IAuthDocument } from '../interfaces/authInterface';
 import { IUserDocument } from '../../user/interfaces/userInterface';
 
-import { authService } from '../../../lib/services/db/authService';
-import { userService } from '../../../lib/services/db/userService';
+import { authService } from '@lib/services/db/authService';
+import { userService } from '@lib/services/db/userService';
 
-import { BadRequestError } from '../../../lib/utils/errors';
-//import { CryptUtil } from '../../../lib/utils/crypt';
-import { config } from '../../../config';
+import { BadRequestError } from '@lib/utils/errors';
+import { config } from '@conf/config';
+
+//import { validate }  from '@validation/baseValidation';
+//import { signinValidate }  from '@validation/authValidation';
 
 
 export class SignIn{
 
     /**
-     * check the user and auth table for a valid
-     * @param req
-     * @param res
+     * POST: check the user and auth table for a valid user/pass or email/pass combo
+     * @param req.body { username, password }
+     * @returns json response
      */
+    //@validate;
     public async read (req: Request, res: Response) : Promise<void> {
 
         // get request body
@@ -51,6 +54,7 @@ export class SignIn{
         // token info
         const sup = {
             userId: user._id,
+            uId: user.uId,
             email: auth.email,
             username: auth.username,
             admin: user.roles?.isAdmin,

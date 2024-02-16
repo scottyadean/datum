@@ -1,7 +1,6 @@
-import { CacheService } from '../../../services/db/cacheService';
-//import { ICommentDocument } from '../../../../features/posts/interfaces/postCommentInterface';
-import { ServerError } from '../../../utils/errors';
-import { PostService } from '../../db/postService';
+import { CacheService } from '@lib/services/db/cacheService';
+import { PostService } from '@lib/services/db/postService';
+import { ServerError } from '@utils/errors';
 
 export class PostCommentCache extends CacheService {
 
@@ -11,7 +10,6 @@ export class PostCommentCache extends CacheService {
         super('post-comment-cache');
         this.postService = new PostService();
     }
-
 
       /**
        * Save post comment to cache.

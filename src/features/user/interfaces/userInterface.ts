@@ -1,6 +1,48 @@
 import mongoose, { Document } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
+export interface UserRolesInterface {
+  isAdmin: boolean;
+  permissions: string[];
+}
+
+export interface UserSocalLinksInterface {
+  name: string;
+  link: string;
+}
+
+export interface UserNotificationsInterface {
+  messages: boolean;
+  reactions: boolean;
+  comments: boolean;
+  follows: boolean;
+}
+
+export interface UserInterface extends Document{
+  _id: string|ObjectId;
+  authId: string|ObjectId;
+  uId: string;
+  displayName: string;
+  profilePicture: string;
+  postsCount: number;
+  followersCount: number;
+  followingCount: number;
+  passwordResetToken: string;
+  passwordResetExpires: number;
+  blocked: ObjectId[]|string[];
+  blockedBy: ObjectId[]|string[];
+  notifications: UserNotificationsInterface;
+  social: UserSocalLinksInterface[];
+  status: string;
+  party: string;
+  location: string;
+  quote: string;
+  bgImageId: string;
+  roles: UserRolesInterface;
+  createdAt: Date;
+}
+
+
 export interface IUserDocument extends Document {
   _id: string | ObjectId;
   authId: string | ObjectId;
@@ -11,21 +53,21 @@ export interface IUserDocument extends Document {
   password?: string;
   avatarColor?: string;
   postsCount: number;
-  work: string;
-  school: string;
+  status: string;
+  party: string;
   quote: string;
   location: string;
   blocked: mongoose.Types.ObjectId[];
   blockedBy: mongoose.Types.ObjectId[];
   followersCount: number;
   followingCount: number;
-  notifications: INotificationSettings;
-  social: ISocialLinks;
+  notifications: UserNotificationsInterface;
+  social: UserSocalLinksInterface[];
   bgImageVersion: string;
   bgImageId: string;
   profilePicture: string;
   createdAt?: Date;
-  roles?: IUserRoles;
+  roles?: UserRolesInterface;
 }
 
 export interface IUserPublicData extends Document {
@@ -38,20 +80,17 @@ export interface IUserPublicData extends Document {
   followingCount: number;
   blocked: mongoose.Types.ObjectId[];
   blockedBy: mongoose.Types.ObjectId[];
-  notifications: INotificationSettings;
-  social: ISocialLinks;
-  work: string;
-  school: string;
+  notifications: UserNotificationsInterface;
+  social: UserSocalLinksInterface[];
+  status: string;
+  party: string;
   quote: string;
   location: string;
   bgImageVersion: string;
   bgImageId: string;
 }
 
-export interface IUserRoles {
-  isAdmin: boolean;
-  permissions: string[];
-}
+
 
 export interface IResetPasswordParams {
   username: string;
@@ -60,26 +99,14 @@ export interface IResetPasswordParams {
   date: string;
 }
 
-export interface INotificationSettings {
-  messages: boolean;
-  reactions: boolean;
-  comments: boolean;
-  follows: boolean;
-}
 
 export interface IBasicInfo {
   quote: string;
-  work: string;
-  school: string;
+  status: string;
+  party: string;
   location: string;
 }
 
-export interface ISocialLinks {
-  facebook: string;
-  instagram: string;
-  twitter: string;
-  youtube: string;
-}
 
 export interface ISearchUser {
   _id: string;
@@ -100,14 +127,14 @@ export interface ILogin {
 
 export interface IUserJobInfo {
   key?: string;
-  value?: string | ISocialLinks;
+  value?: string | UserSocalLinksInterface;
 }
 
 export interface IUserJob {
   keyOne?: string;
   keyTwo?: string;
   key?: string;
-  value?: string | INotificationSettings | IUserDocument;
+  value?: string | UserNotificationsInterface | IUserDocument;
 }
 
 export interface IEmailJob {
@@ -122,27 +149,27 @@ export interface IAllUsers {
 }
 
 export interface IUserJoinDocument {
-  _id: string | number | ObjectId;
-  username: string;
-  displayName: number;
-  uId: string;
-  email: string;
-  avatarColor: string;
-  createdAt: string;
-  postsCount: string;
-  work: number;
-  school: number;
-  quote: number;
-  location: number;
-  blocked: number;
-  blockedBy: number;
-  followersCount: number;
-  followingCount: number;
-  notifications: number;
-  social: number;
-  bgImageId: number;
-  profilePicture: number;
-  roles?: number;
+  _id: string| number | ObjectId;
+  username?: string|number;
+  displayName?: string|number;
+  uId?: string|number;
+  email?: string|number;
+  avatarColor?: string|number;
+  createdAt?: string|number;
+  postsCount?: string|number;
+  status?: string|number;
+  party?: string|number;
+  quote?: string|number;
+  location?: string|number;
+  blocked?: string|number;
+  blockedBy?: string|number;
+  followersCount?: string|number;
+  followingCount?: string|number;
+  notifications?: string|number;
+  social?: string|number;
+  bgImageId?: string|number;
+  profilePicture?: string|number;
+  roles?: string|number;
 }
 
 export const initialUserdata = (id: string, uId: string, username: string, displayName: string, email: string, avatarColor: string) => {
@@ -157,9 +184,9 @@ export const initialUserdata = (id: string, uId: string, username: string, displ
     profilePicture: '',
     blocked: [],
     blockedBy: [],
-    work: '',
+    status: '',
     location: '',
-    school: '',
+    party: '',
     quote: '',
     bgImageVersion: '',
     bgImageId: '',
@@ -176,11 +203,6 @@ export const initialUserdata = (id: string, uId: string, username: string, displ
       isAdmin: false,
       permissions: []
     },
-    social: {
-      facebook: '',
-      instagram: '',
-      twitter: '',
-      youtube: ''
-    }
+    social: []
   } as unknown as IUserDocument;
 };

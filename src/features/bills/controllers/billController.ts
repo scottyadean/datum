@@ -9,7 +9,7 @@ import { Lang } from '../../../lib/utils/lang';
 
 const service: BillService  = new BillService();
 
-export class BillsController {
+export class BillController {
 
         /**
          * list all bills by year
@@ -84,6 +84,7 @@ export class BillsController {
                     description: description,
                     summary: summary,
                     body: [billBody],
+                    currentBody: body,
                     introducedBy: '',
                     subjects: [],
                     amendments: [],

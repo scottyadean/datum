@@ -5,7 +5,7 @@ import { SignIn } from '../controllers/signin';
 import { SignOut } from '../controllers/signout';
 import { AuthedUser } from '../controllers/authedUser';
 import { AuthedPasswords } from '../controllers/authPasswords';
-import { authMiddleWare } from '../../../lib/middlewares/authMiddleware';
+import { authMiddleWare } from '@lib/middlewares/authMiddleware';
 class AuthRoutes {
 
     private router: Router;
@@ -36,7 +36,7 @@ class AuthRoutes {
 
 
 
-    
+
 }
 
 

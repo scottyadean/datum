@@ -1,6 +1,6 @@
 import Logger from 'bunyan';
 import { createClient } from 'redis';
-import { config } from '../../../config';
+import { config } from '../../../config/config';
 export type RedisClient = ReturnType<typeof createClient>;
 
 export abstract class CacheService {

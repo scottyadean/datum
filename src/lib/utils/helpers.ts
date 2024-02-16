@@ -6,7 +6,6 @@ export class Helpers{
 
 
     static parseJson(data: string) : unknown | null {
-
         try{
             return JSON.parse(data);
         }catch(err){
@@ -14,7 +13,6 @@ export class Helpers{
             return null;
         }
     }
-
 
     static has(obj:object, prop:string) : boolean {
         return Object.prototype.hasOwnProperty.call(obj, prop);
@@ -32,6 +30,9 @@ export class Helpers{
         return [...Array(len)].reduce(a=>a+p[~~(Math.random()*p.length)], '');
     }
 
+    static rangeSet(start = 1, end = 10) : Array<number|string> {
+        return [...Array(end - start + 1).keys()].map(x => x + start);
+    }
 
     static addHoursToDate(hours = 1) : Date {
         const date = new Date();

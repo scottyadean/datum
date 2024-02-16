@@ -1,21 +1,30 @@
-
 import { Express, Request, Response } from 'express';
 import listEndpoints from 'express-list-endpoints';
 import HTTP_STATUS from 'http-status-codes';
-
-import { adminService } from '../../../lib/services/db/adminService';
-import { Lang } from '../../../lib/utils/lang';
+import { adminService } from '@lib/services/db/adminService';
+import { Lang } from '@lib/utils/lang';
 
 
     export class AdminController {
-        
+
+        /**
+         * List all api endpoints
+         * @method get
+         * @param _req
+         * @param res
+         */
         public async routes( _req: Request, res: Response  ): Promise<void> {
            const app:Express = res.app as Express;
            res.status(HTTP_STATUS.OK).json(Lang.defaultSuccessRes(listEndpoints(app)));
         }
 
+        /**
+         * check if a user is admin
+         * @method get
+         * @param _req
+         * @param res
+         */
         public async index( _req: Request, res: Response ): Promise<void>{
-
             try{
                 const users = await adminService.index( );
                 res.status(HTTP_STATUS.OK).json( Lang.defaultSuccessRes(users) );
@@ -23,8 +32,13 @@ import { Lang } from '../../../lib/utils/lang';
                 res.status(HTTP_STATUS.BAD_REQUEST).json( Lang.defaultErrorRes(`${err}`) );
             }
         }
-        
-        
+
+        /**
+         * update user roles if admin role
+         * @method post
+         * @param _req
+         * @param res
+         */
         public async updateRoles( req: Request, res: Response ): Promise<void> {
             try{
                 const userUpdate = await adminService.updateUserRoles(req.body.id, req.body.roles);

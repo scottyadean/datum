@@ -16,7 +16,7 @@ import { BaseSockets } from '../lib/sockets/BaseSockets';
 
 import AppRoutes from '../routes';
 import { AppErrorResponse, CustomError } from '../lib/utils/errors';
-import { config } from '../config';
+import { config } from '../config/config';
 
 const log: Logger = config.initLogger('server init');
 
@@ -71,7 +71,7 @@ export class AppServer {
     AppRoutes(app);
   }
 
-  
+
 
   // global error middleware
   private errorMW(app: Application): void {

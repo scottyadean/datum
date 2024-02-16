@@ -4,16 +4,28 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "_version": "2.0.0",
-  
     "compilerOptions": {
-      "lib": ["es2023"],
+        "baseUrl": "src",
+        "paths": {
+          "@root/*":["/*"],
+          "@features/*": ["features/*"],
+          "@lib/*": ["lib/*"],
+          "@conf/*": ["config/*"],
+          "@cache/*": ["lib/services/cache/*"],
+          "@validation/*": ["validation/*"],
+          "@utils/*": ["lib/utils/*"]
+        },
+
+      "lib": ["es2022"],
       "module": "Node16",
       "target": "es2022",
       "outDir": "./build", 
-      "strict": true,
+      "strict": false,
       "esModuleInterop": true,
-      "skipLibCheck": true,
+      "resolveJsonModule": true,
+      "skipLibCheck": false,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
       "forceConsistentCasingInFileNames": true
     }
   }
-    

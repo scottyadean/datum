@@ -1,8 +1,8 @@
-import { CacheService } from '../../db/cacheService';
-import { IUserDocument } from '../../../../features/user/interfaces/userInterface';
-import { ServerError } from '../../../utils/errors';
-import { Helpers } from '../../../utils/helpers';
-import { UserModel } from '../../../../features/user/schemes/userSchema';
+import { CacheService } from '@lib/services/db/cacheService';
+import { IUserDocument } from '@features/user/interfaces/userInterface';
+import { ServerError } from '@utils/errors';
+import { Helpers } from '@utils/helpers';
+import { UserModel } from '@features/user/models/userModel';
 
 export class UserCache extends CacheService {
 
@@ -49,9 +49,9 @@ export class UserCache extends CacheService {
                           'roles': 1  };
         for (const [k, v] of Object.entries(user)) {
             if (  Helpers.has(parser, k) ) {
-                output[k as keyof IUserDocument] = Helpers.parseJson( v );
+                output[k] = Helpers.parseJson( v );
             }else{
-                output[k as keyof IUserDocument] = v;
+                output[k] = v;
             }
           }
     }catch(err){
@@ -81,7 +81,7 @@ export class UserCache extends CacheService {
             followersCount,
             followingCount,
             notifications,
-            work,
+            party,
             location,
             roles,
             quote,
@@ -113,7 +113,7 @@ export class UserCache extends CacheService {
       'followersCount', `${followersCount}`,
       'followingCount', `${followingCount}`,
       'notifications', JSON.stringify(notifications),
-      'work', `${work}`,
+      'party', `${party}`,
       'location', `${location}`,
       'quote', `${quote}`,
       'roles', JSON.stringify(roles)

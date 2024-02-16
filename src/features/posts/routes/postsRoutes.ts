@@ -23,7 +23,7 @@ class PostRoutes {
         this.authRouter.post('/create', PostsController.prototype.create);
         this.authRouter.post('/update', PostsController.prototype.update);
         this.authRouter.post('/recation', PostsController.prototype.recation);
-        this.authRouter.post('/comment', PostsController.prototype.comment)
+        this.authRouter.post('/comment', PostsController.prototype.comment);
         return this.authRouter;
     }
 

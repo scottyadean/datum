@@ -1,6 +1,9 @@
 import { model, Model} from 'mongoose';
 import { IPostReactionDocument } from '../interfaces/postsInterface';
-import { postReactionsSchema } from '../schemas/postReactionsSchema';
+import { postReactionSchema } from '../schemas/postReactionsSchema';
 
-const PostReactionsModel: Model<IPostReactionDocument> = model<IPostReactionDocument>('Reaction', postReactionsSchema, 'Reaction');
+import { Schema } from 'mongoose';
+export const postReactionsSchema: Schema = new Schema(postReactionSchema);
+
+const PostReactionsModel: Model<IPostReactionDocument> = model<IPostReactionDocument>('PostReaction', postReactionsSchema, 'PostReaction');
 export { PostReactionsModel };

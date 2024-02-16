@@ -1,6 +1,6 @@
 
 import { EmailMarkup } from './emailMarkup';
-import {config} from '../../../../config';
+import {config} from '../../../../config/config';
 
 export interface IPasswordEmailTmplProps {
     title: string;

@@ -6,7 +6,7 @@ import { userService } from '../../../lib/services/db/userService';
 import { AuthPayload } from '../../../features/auth/interfaces/authInterface';
 import { AuthModel } from '../../../features/auth/schemes/auth';
 import { UserCache } from '../cache/users/UserCache';
-import { config } from '../../../config';
+import { config } from '../../../config/config';
 
 
 const userCache: UserCache = new UserCache();

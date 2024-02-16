@@ -4,7 +4,7 @@ import { IUserDocument } from '../../../../src/features/user/interfaces/userInte
 import { ISavePostToCache } from '../../../../src/features/posts/interfaces/postsInterface';
 import { ServerError } from '../../../../src/lib/utils/errors';
 import { Helpers } from '../../../../src/lib/utils/helpers';
-import { config } from '../../../../src/config';
+import { config } from '../../../../src/config/config';
 
 export class RedisService extends CacheService {
 
@@ -125,7 +125,7 @@ export class RedisService extends CacheService {
             followersCount,
             followingCount,
             notifications,
-            work,
+            party,
             location,
             roles,
             quote,
@@ -157,7 +157,7 @@ export class RedisService extends CacheService {
       'followersCount', `${followersCount}`,
       'followingCount', `${followingCount}`,
       'notifications', JSON.stringify(notifications),
-      'work', `${work}`,
+      'party', `${party}`,
       'location', `${location}`,
       'quote', `${quote}`,
       'roles', JSON.stringify(roles)

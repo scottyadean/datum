@@ -1,6 +1,6 @@
 import { Request, NextFunction, Response } from 'express';
 import JWT from 'jsonwebtoken';
-import {config} from '../../config';
+import {config} from '../../config/config';
 
 import { NoAuthError } from '../utils/errors';
 import { AuthPayload } from '../../features/auth/interfaces/authInterface';

@@ -1,6 +1,7 @@
-import mongoose, { Schema } from 'mongoose';
-export const postReactionsSchema: Schema = new Schema({
-  postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Posts', index: true },
+import mongoose from 'mongoose';
+
+export const postReactionSchema = {
+  postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', index: true },
   type: { type: String, default: '' },
   userTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   userFrom: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -8,4 +9,4 @@ export const postReactionsSchema: Schema = new Schema({
   userImage: { type: String, default: '' },
   userComment: { type: String, default: ''},
   createdAt: { type: Date, default: Date.now() }
-});
+};

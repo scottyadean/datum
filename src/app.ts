@@ -1,7 +1,7 @@
 import express, { Express } from 'express';
 import { AppServer } from './boot/AppServer';
 import { AppDB } from './boot/AppDB';
-import { config } from './config';
+import { config } from './config/config';
 
 class App {
 

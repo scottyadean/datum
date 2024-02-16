@@ -3,7 +3,7 @@ import Logger from 'bunyan';
 import { DoneCallback, Job } from 'bull';
 
 import { EmailSender } from '../services/messages/emailSender';
-import {config} from '../../config';
+import {config} from '../../config/config';
 
 const log: Logger = config.initLogger('emailWorker');
 

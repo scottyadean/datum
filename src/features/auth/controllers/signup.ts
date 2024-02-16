@@ -5,21 +5,22 @@ import HTTP_STATUS from 'http-status-codes';
 import JWT from 'jsonwebtoken';
 
 
-import { IAuthDocument, ISignUpData } from '../interfaces/authInterface';
-import { IUserDocument, initialUserdata } from '../../user/interfaces/userInterface';
-import { BadRequestError } from '../../../lib/utils/errors';
-import { authService } from '../../../lib/services/db/authService';
-import { authQueue } from '../../../lib/services/queue/authQueue';
-import { userQueue } from '../../../lib/services/queue/userQueue';
-import { UserCache } from '../../../lib/services/cache/users/UserCache';
-import { Helpers } from '../../../lib/utils/helpers';
-import { config } from '../../../config';
-import { Lang } from '../../../lib/utils/lang';
+import { IAuthDocument } from '../interfaces/authInterface';
+import { AuthModelMethods } from '../models/AuthModel';
+import { IUserDocument, initialUserdata } from '@features/user/interfaces/userInterface';
+import { BadRequestError } from '@lib/utils/errors';
+import { authService } from '@lib/services/db/authService';
+import { authQueue } from '@lib/services/queue/authQueue';
+import  UserQueue  from '@lib/services/queue/userQueue';
+import { UserCache } from '@lib/services/cache/users/UserCache';
+import { Helpers } from '@lib/utils/helpers';
+import { config } from '@conf/config';
+import { Lang } from '@lib/utils/lang';
 
 
 // TODO implement photo upload
-// import { UploadService } from '../../../lib/services/db/uploadService';
-// import { authValidation } from '../../../lib/decorators/authValidation';
+// import { UploadService } from '@lib/services/db/uploadService';
+// import { authValidation } from '@lib/decorators/authValidation';
 // import { signupSchema } from '../schemes/signup';
 
 
@@ -35,6 +36,7 @@ export class SignUp {
 
   //@authValidation(signupSchema)
   public async create(req: Request, res: Response): Promise<void> {
+
     // get post params
     const { username, email, password, avatarColor, displayName } = req.body;
 
@@ -46,11 +48,12 @@ export class SignUp {
 
     // create the ids.
     const authObjectId: ObjectId = new ObjectId();
+
     //const userObjectId: ObjectId = new ObjectId();
     const uId = `${new Date().getTime()}${Helpers.randomIntHash()}`;
 
     // collect the private auth data to store in the Auth model
-    const authData: IAuthDocument = SignUp.signUpData({ _id: authObjectId, uId, username, email, password, avatarColor });
+    const authData: IAuthDocument = AuthModelMethods.signUpData({ _id: authObjectId, uId, username, email, password, avatarColor });
 
     // Fill in intal user profile data
     const userData: IUserDocument = initialUserdata(`${authObjectId}`, uId, username, displayName, email, avatarColor);
@@ -63,6 +66,7 @@ export class SignUp {
 
     // omit the auth data from the public user data.
     omit(userData, ['username', 'email', 'avatarColor', 'password', 'passwordResetToken', 'passwordResetExpires']);
+    const userQueue: UserQueue = new UserQueue('user');
     userQueue.addUserJob({ value: userData });
 
     //assign the user to the current session
@@ -91,13 +95,5 @@ export class SignUp {
     return JWT.sign(sup, config.JWT_SECRET!);
   }
 
-  /**
-   *  return the private auth data from the user object.
-   * @param data
-   * @returns IAuthDocument
-   */
-  public static signUpData(data: ISignUpData): IAuthDocument {
-    const { _id, username, email, uId, password, avatarColor } = data;
-    return { _id, uId, username, email, password, avatarColor, createdAt: new Date() } as IAuthDocument;
-  }
+
 }
