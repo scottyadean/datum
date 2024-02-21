@@ -6,7 +6,6 @@ import { Lang } from '@lib/utils/lang';
 
 
     export class AdminController {
-
         /**
          * List all api endpoints
          * @method get
